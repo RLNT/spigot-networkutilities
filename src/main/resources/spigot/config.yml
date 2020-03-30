@@ -1,0 +1,39 @@
+###################################################################
+###                             MAIN                            ###
+###################################################################
+# In this section you can adjust the main options of the plugin.  #
+###################################################################
+
+# HUB SERVER OPTION #
+# This option defines whether this server is the hub/lobby server.
+# The hub server option is important for the firstJoinBroadcast
+# system. It's important to restart after adjusting this setting.
+# After the restart, a messages.yml file will be available only
+# for the hub/lobby server.
+# MULTIPLE HUBS/LOBBIES ARE NOT SUPPORTED!
+isHubServer: false
+
+
+###################################################################
+###                           MODULES                           ###
+###################################################################
+# In this section you can toggle each module.                     #
+# For the case you don't need one of the modules NetworkUtilities #
+# offers, you can simply disable it. This will also save some     #
+# performance because the module isn't even loaded.               #
+###################################################################
+
+# SERVER NOTIFICATIONS MODULE #
+# This module allows to disable server join and quit messages.
+# It is recommended to enable this module if you use the plugin's
+# connectionNotifications system on the proxy.
+# Note that this setting might be overwritten by some other plugins
+# that are loaded after this one.
+serverNotifications:
+  disableJoinMessages: true   # disable the server join messages
+  disableQuitMessages: true   # disable the server quit/leave messages
+
+
+
+### DON'T EDIT ANYTHING BELOW THIS LINE ###
+configVersion: "1.0.0"

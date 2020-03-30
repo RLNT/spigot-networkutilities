@@ -1,0 +1,7 @@
+main: rlnt.networkutilities.spigot.NetworkUtilities
+name: NetworkUtilities
+version: ${project.version}
+description: A plugin that adds all network features you need.
+api-version: 1.13
+load: STARTUP
+author: RLNT

@@ -1,0 +1,278 @@
+###################################################################
+###                           MESSAGES                          ###
+###################################################################
+# In this file, you can adjust all messages of the plugin.        #
+#                                                                 #
+# Each message can be toggled by adjusting the <enabled> key.     #
+# You can use color and formatting codes.                         #
+# Placeholders that are available for each message are explained  #
+# in the section above it.                                        #
+#                                                                 #
+# You can also use multine messages. That requires special form:  #
+#                                                                 #
+# message: |-                                                     #
+#   Whatever my line 1 should be                                  #
+#   Whatever my line 2 should be                                  #
+#   &cOohh, my line 3 is colored                                  #
+#                                                                 #
+# The |- symbol is important. For the lines below it, you don't   #
+# need any quotation marks ("") or commas (,).                    #
+###################################################################
+
+
+###################################################################
+###                       MODULES MESSAGES                      ###
+###################################################################
+
+# FIRST JOIN NOTIFICATIONS MODULE MESSAGES #
+firstJoinNotifications:
+  # This message is shown to the player that joined the network
+  # for the first time.
+  #  > setting 'enabled' to false will completely disable the message
+  #  > setting 'enabled' to true but setting the message to an empty
+  #    string ("") will send the player the same message that the
+  #    network receives if the network message is enabled
+  # Available placeholders:
+  #  > %player% - the name of the player that connected for the first time
+  player:
+    enabled: true
+    message: "&6Welcome to our Network, &e%player%&6! &aI see you are new here."
+
+  # This message is shown to the network when a player joins for
+  # the first time.
+  #  > setting 'enabled' to false will completely disable the message
+  #  > setting 'enabled' to true but setting the message to an empty
+  #    string ("") will also disable the message completely
+  # Available placeholders:
+  #  > %player% - the name of the player that connected for the first time
+  network:
+    enabled: true
+    message: "&e%player% &aconnected for the first time!"
+
+
+# CONNECTION NOTIFICATIONS MODULE MESSAGES #
+connectionNotifications:
+  # all messages that are sent when someone joins the network
+  networkJoin:
+    # This message is shown to the player that joined the network.
+    #  > setting 'enabled' to false will completely disable the message
+    #  > setting 'enabled' to true but setting the message to an empty
+    #    string ("") will send the player the same message that the
+    #    network receives if the network message is enabled
+    # Available placeholders:
+    #  > %player% - the name of the player that connected
+    #  > %server% - the name of the server the player joined on connect
+    player:
+      enabled: true
+      message: "&6Welcome to our Network, &e%player%&6! &aYou are now on the server &e%server%&a."
+
+    # This message is shown to the network when a player connects.
+    #  > setting 'enabled' to false will completely disable the message
+    #  > setting 'enabled' to true but setting the message to an empty
+    #    string ("") will also disable the message completely
+    # Available placeholders:
+    #  > %player% - the name of the player that connected
+    #  > %server% - the name of the server the player joined on connect
+    network:
+      enabled: true
+      message: "&e%player% &ahas entered the network and is now on the server &e%server%&a!"
+
+  # all messages that are sent when someone switches servers
+  serverSwitch:
+    # This message is shown to the player that switched servers.
+    #  > setting 'enabled' to false will completely disable the message
+    #  > setting 'enabled' to true but setting the message to an empty
+    #    string ("") will send the player the same message that the
+    #    network receives if the network message is enabled
+    # Available placeholders:
+    #  > %player% - the name of the player that switched servers
+    #  > %old% - the name of the server the player switched from
+    #  > %new% - the name of the server the player switched to
+    player:
+      enabled: true
+      message: "&fYou (&7%player%&f) switched from server &a%old% &fto server &a%new%&f!"
+
+    # This message is shown to the network when a player switched servers.
+    # You can define a switch message for the old server the player came
+    # from, for the new server the player joined and for the rest of the
+    # players on the network that are not on either of both servers.
+    #  > setting 'enabled' to false will completely disable the message
+    #  > setting 'enabled' to true but setting the message to an empty
+    #    string ("") will also disable the message completely
+    # Available placeholders:
+    #  > %player% - the name of the player that switched servers
+    #  > %old% - the name of the server the player switched from
+    #  > %new% - the name of the server the player switched to
+    network:
+      enabled: true
+      network: "&e%player% &fswitched from server &a%old% &fto server &a%new%&f!"
+      oldServer: "&e%player% &fswitched from your server (&7%old%&f) to server &a%new%&f!"
+      newServer: "&e%player% &fswitched from server &a%old% &fto your server (&7%new%&f)!"
+
+  # all messages that are sent when someone leaves the network
+  networkQuit:
+    # This message is shown to the network when someone disconnects.
+    #  > setting 'enabled' to false will completely disable the message
+    #  > setting 'enabled' to true but setting the message to an empty
+    #    string ("") will also disable the message completely
+    # Available placeholders:
+    #  > %player% - the name of the player that disconnected
+    #  > %server% - the name of the server the player was last on
+    enabled: true
+    message: "&e%player% &chas left the network (&7last server &a%server%&c)!"
+
+
+# WAIT FOR SERVER MODULE MESSAGES #
+waitForServer:
+  # This message is sent when someone gets kicked from the network
+  # because the server the player is trying to connect to is not
+  # online yet.
+  # Available placeholders:
+  #  > %player% - the name of the player that tried to connect
+  #  > %server% - the name of the server the player tried to connect to
+  kickMessage: |-
+    &4&lYOUR CONNECTION WAS CANCELLED!
+    &r &r
+    &cThe server you are trying to connect to is not online at the moment!
+    &r &r
+    &bPlayer: &f%player%
+    &bServer: &c%server%
+
+  # This message is sent when someone tries to connect to a server
+  # that isn't currently online.
+  # Available placeholders:
+  #  > %player% - the name of the player that tried to connect
+  #  > %server% - the name of the server the player tried to connect to
+  playerMessage: "&cSorry &e%player%&c! &fThe server you are trying to connect to (&7%server%&f) is not online!"
+
+
+###################################################################
+###                       COMMAND MESSAGES                      ###
+###################################################################
+commands:
+
+  # general command messages
+  general:
+    # This message is sent to anything that is not a player when
+    # trying to execute a player only command e.g. the console.
+    #  > setting 'enabled' to false will completely disable the message
+    #  > setting 'enabled' to true but setting the message to an empty
+    #    string ("") will also disable the message completely
+    playerOnly:
+      enabled: true
+      message: "&4This command is only executable by a player!"
+
+    # This message is sent to a player not having the required
+    # permission to execute a command.
+    #  > setting 'enabled' to false will completely disable the message
+    #  > setting 'enabled' to true but setting the message to an empty
+    #    string ("") will also disable the message completely
+    # Available placeholders:
+    #  > {permission} - the missing permission
+    noPermission:
+      enabled: true
+      message: "&4You don't have permission &7(&e{permission}&7) &4to execute this command!"
+
+  # hub command specific messages
+  hub:
+    helpText:
+      player:
+        enabled: true
+        message: |-
+          &r &r
+          &8> &6NetworkUtilities Command Help &8<
+          &r &r
+          &f Usage:
+          &7 /&ehub &8[&aplayer&7|&aserver&7|&aall&8]
+          &r &r
+      nonplayer:
+        enabled: true
+        message: "&cIncorrect usage! &eUsage: &7/&fhub &8[&aplayer&7|&aserver&7|&aall&8]"
+
+    hubAlready:
+      player:
+        enabled: true
+        message: "&4You are in the Hub already!"
+      other:
+        enabled: true
+        message: "&e{player} &4is in the Hub already!"
+      nonplayer:
+        enabled: true
+        message: "&e{player} &4is in the Hub already!"
+      server:
+        enabled: true
+        message: "&4You cannot enter the the Hub as origin server!"
+
+    hubOffline:
+      player:
+        enabled: true
+        message: "&4Could not send you to the Hub! It seems to be offline!"
+      other:
+        enabled: true
+        message: "&e{player} &4couldn't be sent to the Hub! It seems to be offline!"
+      nonplayer:
+        enabled: true
+        message: "&e{player} &4couldn't be sent to the Hub! It seems to be offline!"
+      server:
+        enabled: true
+        message: "&e{server} &4couldn't be sent to the Hub! The hub seems to be offline!"
+
+    server:
+      offline:
+        enabled: true
+        message: "&e{server} &4seems to be offline! No players were teleported to the Hub."
+      empty:
+        enabled: true
+        message: "&e{server} &4has no online players! No players were teleported to the Hub."
+      partial:
+        enabled: true
+        message: "&eNot all players could be sent to the Hub! &a{success} successful&7, &c{failed} failed"
+
+    success:
+      player:
+        enabled: true
+        message: "&aYou have been teleported to the Hub!"
+      other:
+        enabled: true
+        message: "&e{player} &ahas been teleported to the Hub!"
+      nonplayer:
+        enabled: true
+        message: "&e{player} &ahas been teleported to the Hub!"
+      server:
+        enabled: true
+        message: "&aAll players of &e{server} &awere teleported to the Hub!"
+
+    fail:
+      player:
+        enabled: true
+        message: "&4Could not send you to the Hub!"
+      other:
+        enabled: true
+        message: "&e{player} &4couldn't be sent to the Hub!"
+      nonplayer:
+        enabled: true
+        message: "&e{player} &4couldn't be sent to the Hub!"
+      server:
+        enabled: true
+        message: "&4No players of &e{server} &4were able to be teleported to the Hub!"
+
+  # whitelist command specific messages
+  whitelist:
+    helpText:
+      player:
+        enabled: true
+        message: |-
+          &r &r
+          &8> &6NetworkUtilities Command Help &8<
+          &r &r
+          &f Usage:
+          &7 /&ewhitelist &aadd&7/&aremove&7/&acheck &buuid&7/&bplayer
+          &r &r
+      nonplayer:
+        enabled: true
+        message: "&cIncorrect usage! &eUsage: &7/&fwhitelist &aadd&7/&aremove&7/&acheck &buuid&7/&bplayer"
+
+
+
+### DON'T EDIT ANYTHING BELOW THIS LINE ###
+messagesVersion: "1.0.0"

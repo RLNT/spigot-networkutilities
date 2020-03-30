@@ -1,0 +1,66 @@
+###################################################################
+###                           MODULES                           ###
+###################################################################
+# In this section you can toggle each module.                     #
+# For the case you don't need one of the modules NetworkUtilities #
+# offers, you can simply disable it. This will also save some     #
+# performance because the module isn't even loaded.               #
+###################################################################
+
+# FIRST JOIN NOTIFICATIONS MODULE #
+# This module allows the whole network to receive notifications
+# about a player connecting to the network for the first time.
+firstJoinNotifications: true
+
+# CONNECTION NOTIFICATIONS MODULE #
+# This module allows the whole network to receive notifications
+# about players joining, leaving and switching servers.
+connectionNotifications: true
+
+# WAIT FOR SERVER MODULE #
+# This module prevents players from joining the network if the
+# target server is not online yet.
+waitForServer: true
+
+# UUID BASED WHITELIST MODULE #
+# This module prevents players from joining the network if they
+# are not on the whitelist. It's UUID based so only valid premium
+# accounts can access the server.
+# If you run your server in offline mode, you should disable that.
+uuidBasedWhitelist: true
+
+
+###################################################################
+###                          COMMANDS                           ###
+###################################################################
+# In this section you can toggle and adjust each command.         #
+# Read carefully because messing up settings could result in the  #
+# the command not being useable.                                  #
+###################################################################
+commands:
+  # HUB/LOBBY COMMAND #
+  # This command allows to teleport to the hub/lobby server.
+  hub:
+    enabled: true             # should the command be enabled?
+    targetServer: "Lobby"     # what's the name of your hub/lobby server? it's case-insensitive
+    permissionRequired: true  # should this command require a permission?
+    commandName: "hub"        # what should be the main command? it's case-sensitive
+    commandAliases:           # what command aliases do you want? they're case-sensitive
+      - lobby
+      - hubserver
+      - lobbyserver
+
+  # WHITELIST COMMAND #
+  # This command allows modification of the UUID based whitelist.
+  # It is automatically disabled if the whitelist module is disabled
+  whitelist:
+    enabled: true
+    permissionRequired: true
+    commandAliases:
+      - wl
+      - whitel
+
+
+
+### DON'T EDIT ANYTHING BELOW THIS LINE ###
+configVersion: "1.0.0"

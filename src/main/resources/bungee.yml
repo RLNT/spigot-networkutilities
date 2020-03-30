@@ -1,0 +1,22 @@
+main: rlnt.networkutilities.proxy.NetworkUtilities
+name: NetworkUtilities
+version: ${project.version}
+description: A plugin that adds all network features you need.
+api-version: 1.13
+load: STARTUP
+author: RLNT
+
+#Permissions:
+#
+#  networkutilities.command.hub
+#  > base permission for the command to see it displayed in tab completion
+#  > needed for all sub commands
+#
+#  networkutilities.command.hub.self
+#  > allows the player to use the hub command for themself
+#
+#  networkutilities.command.hub.other
+#  > allows the player to teleport other players to the hub
+#
+#  networkutilities.command.hub.server
+#  > allows the player to teleport a whole server to the hub
