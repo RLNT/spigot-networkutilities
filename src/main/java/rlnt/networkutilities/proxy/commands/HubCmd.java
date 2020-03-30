@@ -52,8 +52,8 @@ public class HubCmd extends Command {
         String subcommand;
         if (args == null || args.length == 0) {
             subcommand = null;
-        } else if (args[0].equals("?") || args[0].equals("help")) {
-            subcommand = "help";
+        } else if (args[0].equals("?") || args.length > 1) {
+            subcommand = "?";
         } else {
             subcommand = args[0];
         }
