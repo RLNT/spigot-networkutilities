@@ -228,6 +228,14 @@ commands:
         enabled: true
         message: "&eNot all players from &c{server} &ecould be sent to the Hub! &a{success} successful&7, &c{failed} failed"
 
+    network:
+      empty:
+        enabled: true
+        message: "$4There are no players in the network! No players were teleported to the Hub."
+      partial:
+        enabled: true
+        message: "&eNot all players from the network could be sent to the Hub! &a{success} successful&7, &c{failed} failed"
+
     success:
       player:
         enabled: true
