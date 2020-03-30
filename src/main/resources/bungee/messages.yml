@@ -259,6 +259,10 @@ commands:
   # whitelist command specific messages
   whitelist:
     helpText:
+      check:
+        missing:
+          enabled: true
+          message: missing argument &buuid&7/&bplayer&r
       player:
         enabled: true
         message: |-
@@ -267,6 +271,7 @@ commands:
           &r &r
           &f Usage:
           &7 /&ewhitelist &aadd&7/&aremove&7/&acheck &buuid&7/&bplayer
+          &7 /&ewhitelist list
           &r &r
       nonplayer:
         enabled: true

@@ -12,23 +12,23 @@ import java.util.UUID;
 
 public class WhitelistListener implements Listener {
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onLogin(LoginEvent event) {
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onLogin(LoginEvent event) {
 
-        if (event.isCancelled()) return;
+		if (event.isCancelled()) return;
 
-        PendingConnection connection = event.getConnection();
-        UUID uuid = connection.getUniqueId();
+		PendingConnection connection = event.getConnection();
+		UUID uuid = connection.getUniqueId();
 
-        if (!connection.isOnlineMode() || uuid == null) {
-            event.setCancelled(true);
-            event.setCancelReason(new TextComponent("get kicked for cracked account"));
-            return;
-        }
+		if (!connection.isOnlineMode() || uuid == null) {
+			event.setCancelled(true);
+			event.setCancelReason(new TextComponent("get kicked for cracked account"));
+			return;
+		}
 
-        if (!Whitelist.isWhitelisted(uuid)) {
-            event.setCancelled(true);
-            event.setCancelReason(new TextComponent("get kicked for not being whitelisted"));
-        }
-    }
+		if (!Whitelist.isWhitelisted(uuid)) {
+			event.setCancelled(true);
+			event.setCancelReason(new TextComponent("get kicked for not being whitelisted"));
+		}
+	}
 }
