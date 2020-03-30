@@ -27,12 +27,7 @@ public class HubCmd extends Command {
         super(getCommandName(), permission, getCommandAlias());
     }
 
-    // TODO: rewrite the Hub command to the console can use it as well and player with networkutilities.command.hub_command.other
-    // TODO: can teleport other players to the hub
-    // TODO: rewrite so parameter all can be used to teleport everyone
-    // TODO: rewrite so parameter serer can be used to teleport a server to the hub
-
-    // TODO: implementieren dass die teleportieren Spieler auch Nachrichten erhalten
+    // TODO: implementieren dass die teleportierten Spieler auch Nachrichten erhalten
 
     @Override
     public void execute(CommandSender sender, String[] args) {
