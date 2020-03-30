@@ -140,20 +140,20 @@ public class WhitelistCmd extends Command {
 
 				Configuration checkMessages = messages.getSection("check");
 				if (args.length < 2) {
-					Communication.playerCfgMsg(player, checkMessages, "missing");
+					Communication.senderCfgMsg(sender, checkMessages, "missing");
 					break;
 				}
 
 				id = getUuidFromPlayerOrUuid(args[1]);
 				if (id == null) {
-					Communication.playerCfgMsg(player, checkMessages, "invalid");
+					Communication.senderCfgMsg(sender, checkMessages, "invalid");
 					break;
 				}
 
 				if (Whitelist.isWhitelisted(id)) {
-					Communication.playerCfgMsg(player, checkMessages, "whitelisted", ImmutableMap.of("{uuid}", id.toString()));
+					Communication.senderCfgMsg(sender, checkMessages, "whitelisted", ImmutableMap.of("{uuid}", id.toString()));
 				} else {
-					Communication.playerCfgMsg(player, checkMessages, "notwhitelisted", ImmutableMap.of("{uuid}", id.toString()));
+					Communication.senderCfgMsg(sender, checkMessages, "notwhitelisted", ImmutableMap.of("{uuid}", id.toString()));
 				}
 				break;
 			case "list":
@@ -164,9 +164,15 @@ public class WhitelistCmd extends Command {
 				}
 
 				Configuration listMessages = messages.getSection("list");
-				Communication.playerCfgMsg(player, listMessages, "list",
-						ImmutableMap.of("{entries}", String.join("\n", Whitelist.getWhitelist()))
-				);
+				if (isPlayer) {
+					Communication.playerCfgMsg(player, listMessages, "list",
+							ImmutableMap.of("{entries}", String.join("\n", Whitelist.getWhitelist()))
+					);
+				} else {
+					Communication.senderCfgMsg(sender, listMessages, "list",
+							ImmutableMap.of("{entries}", String.join(",", Whitelist.getWhitelist()))
+					);
+				}
 				break;
 			case "add":
 
@@ -176,20 +182,20 @@ public class WhitelistCmd extends Command {
 
 				Configuration addMessages = messages.getSection("add");
 				if (args.length < 2) {
-					Communication.playerCfgMsg(player, addMessages, "missing");
+					Communication.senderCfgMsg(sender, addMessages, "missing");
 					break;
 				}
 
 				id = getUuidFromPlayerOrUuid(args[1]);
 				if (id == null) {
-					Communication.playerCfgMsg(player, addMessages, "invalid");
+					Communication.senderCfgMsg(sender, addMessages, "invalid");
 					break;
 				}
 
 				if (Whitelist.addWhitelist(id)) {
-					Communication.playerCfgMsg(player, addMessages, "success");
+					Communication.senderCfgMsg(sender, addMessages, "success");
 				} else {
-					Communication.playerCfgMsg(player, addMessages, "duplicate");
+					Communication.senderCfgMsg(sender, addMessages, "duplicate");
 				}
 
 				break;
@@ -202,26 +208,26 @@ public class WhitelistCmd extends Command {
 
 				Configuration removeMessages = messages.getSection("remove");
 				if (args.length < 2) {
-					Communication.playerCfgMsg(player, removeMessages, "missing");
+					Communication.senderCfgMsg(sender, removeMessages, "missing");
 					break;
 				}
 
 				id = getUuidFromPlayerOrUuid(args[1]);
 				if (id == null) {
-					Communication.playerCfgMsg(player, removeMessages, "invalid");
+					Communication.senderCfgMsg(sender, removeMessages, "invalid");
 					break;
 				}
 
 				if (Whitelist.removeWhitelist(id)) {
-					Communication.playerCfgMsg(player, removeMessages, "success");
+					Communication.senderCfgMsg(sender, removeMessages, "success");
 				} else {
-					Communication.playerCfgMsg(player, removeMessages, "duplicate");
+					Communication.senderCfgMsg(sender, removeMessages, "duplicate");
 				}
 
 				break;
 			default:
-				// player used unknown subcommand
-				Communication.playerCfgMsg(player, helpText, "player");
+				// sender used unknown subcommand
+				Communication.senderCfgMsg(sender, helpText, "player");
 		}
 	}
 }
