@@ -109,15 +109,11 @@ public class WhitelistCmd extends Command {
 			subcommand = args[0];
 		}
 
-		Configuration helpText = messages.getSection("helpText");
-
-		// java is retarded and does not have scoped switchs
-		UUID id;
+		Configuration helpText = messages.getSection("help");
 
 		// sub command logic
 		if (subcommand == null) {
 			// nothing, help or ? has been entered, display help text
-
 			if (isPlayer) {
 				// player used the command
 				Communication.playerCfgMsg(player, helpText, "player");
@@ -129,11 +125,11 @@ public class WhitelistCmd extends Command {
 			return;
 		}
 
-
+		// java is retarded and does not have scoped switches
+		UUID id;
 		switch (subcommand) {
 			case "check":
 				// todo: make text clickable to remove or add the player to the whitelist
-
 				if (checkPermission(sender, "check")) {
 					break;
 				}
@@ -158,24 +154,22 @@ public class WhitelistCmd extends Command {
 				break;
 			case "list":
 				// todo: make pageable
-
 				if (checkPermission(sender, "list")) {
 					break;
 				}
 
 				Configuration listMessages = messages.getSection("list");
 				if (isPlayer) {
-					Communication.playerCfgMsg(player, listMessages, "list",
+					Communication.playerCfgMsg(player, listMessages, "player",
 							ImmutableMap.of("{entries}", String.join("\n", Whitelist.getWhitelist()))
 					);
 				} else {
-					Communication.senderCfgMsg(sender, listMessages, "list",
+					Communication.senderCfgMsg(sender, listMessages, "nonplayer",
 							ImmutableMap.of("{entries}", String.join(",", Whitelist.getWhitelist()))
 					);
 				}
 				break;
 			case "add":
-
 				if (checkPermission(sender, "add")) {
 					break;
 				}
@@ -201,7 +195,6 @@ public class WhitelistCmd extends Command {
 				break;
 			case "delete":
 			case "remove":
-
 				if (checkPermission(sender, "remove")) {
 					break;
 				}
@@ -221,13 +214,19 @@ public class WhitelistCmd extends Command {
 				if (Whitelist.removeWhitelist(id)) {
 					Communication.senderCfgMsg(sender, removeMessages, "success");
 				} else {
-					Communication.senderCfgMsg(sender, removeMessages, "duplicate");
+					Communication.senderCfgMsg(sender, removeMessages, "nonexistent");
 				}
 
 				break;
 			default:
 				// sender used unknown subcommand
-				Communication.senderCfgMsg(sender, helpText, "player");
+				if (isPlayer) {
+					// player used the command
+					Communication.playerCfgMsg(player, helpText, "player");
+				} else {
+					// nonplayer used the command
+					Communication.senderCfgMsg(sender, helpText, "nonplayer");
+				}
 		}
 	}
 }

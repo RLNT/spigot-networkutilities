@@ -258,11 +258,7 @@ commands:
 
   # whitelist command specific messages
   whitelist:
-    helpText:
-      check:
-        missing:
-          enabled: true
-          message: missing argument &buuid&7/&bplayer&r
+    help:
       player:
         enabled: true
         message: |-
@@ -276,6 +272,54 @@ commands:
       nonplayer:
         enabled: true
         message: "&cIncorrect usage! &eUsage: &7/&fwhitelist &aadd&7/&aremove&7/&acheck &buuid&7/&bplayer"
+    check:
+      missing:
+        enabled: true
+        message: missing argument &buuid&7/&bplayer&r
+      invalid:
+        enabled: true
+        message: invalid argument, must be valid UUID or player name
+      whitelisted:
+        enabled: true
+        message: "{uuid} is whitelisted"
+      notwhitelisted:
+        enabled: true
+        message: "{uuid} is not whitelisted"
+    list:
+      player:
+        enabled: true
+        message: |-
+          Whitelisted UUIDs:
+          {entries}
+      nonplayer:
+        enabled: true
+        message: "Whitelisted UUIDs: {entries}"
+    add:
+      missing:
+        enabled: true
+        message: missing argument &buuid&7/&bplayer&r
+      invalid:
+        enabled: true
+        message: invalid argument, must be valid UUID or player name
+      success:
+        enabled: true
+        message: added {uuid} from whitelist
+      duplicate:
+        enabled: true
+        message: "{uuid} is already on the whitelist"
+    remove:
+      missing:
+        enabled: true
+        message: missing argument &buuid&7/&bplayer&r
+      invalid:
+        enabled: true
+        message: invalid argument, must be valid UUID or player name
+      success:
+        enabled: true
+        message: removed {uuid} from whitelist
+      nonexistent:
+        enabled: true
+        message: "{uuid} is not on the whitelist"
 
 
 
