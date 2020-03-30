@@ -78,4 +78,14 @@ public enum Player {
     public static Collection<ProxiedPlayer> getPlayersByServer(String server) {
         return ProxyServer.getInstance().getServerInfo(server).getPlayers();
     }
+
+    /**
+     * Will return a collection with all players that
+     * are currently in the network.
+     *
+     * @return the players in the network
+     */
+    public static Collection<ProxiedPlayer> getNetworkPlayers() {
+        return ProxyServer.getInstance().getPlayers();
+    }
 }
