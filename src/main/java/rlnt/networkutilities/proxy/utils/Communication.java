@@ -5,6 +5,7 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.config.Configuration;
+import org.bukkit.command.Command;
 
 import java.util.Collection;
 import java.util.Map;
@@ -48,6 +49,19 @@ public enum Communication {
      * @param section the configuration section
      * @param type the type of the message
      */
+    public static void playerCfgMsg(ProxiedPlayer player, Configuration section, String type) {
+        playerCfgMsg(player, section, type, null);
+    }
+
+    /**
+     * Will send a colorized message from the config to a
+     * player when the message is enabled and not empty.
+     *
+     * @param player the player to send the message to
+     * @param section the configuration section
+     * @param type the type of the message
+     * @param placeholders a map of values to be replaced in the message
+     */
     public static void playerCfgMsg(ProxiedPlayer player, Configuration section, String type, Map<String, String> placeholders) {
         if (!Config.messageEnabled(section, type)) return;
         if (Config.messageEmpty(section, type)) return;
@@ -83,6 +97,19 @@ public enum Communication {
      * @param sender the command sender to send the message to
      * @param section the configuration section
      * @param type the type of the message
+     */
+    public static void senderCfgMsg(CommandSender sender, Configuration section, String type) {
+        senderCfgMsg(sender, section, type, null);
+    }
+
+    /**
+     * Will send a colorized message from the config to a
+     * sender when the message is enabled and not empty.
+     *
+     * @param sender the command sender to send the message to
+     * @param section the configuration section
+     * @param type the type of the message
+     * @param placeholders a map of values to be replaced in the message
      */
     public static void senderCfgMsg(CommandSender sender, Configuration section, String type, Map<String, String> placeholders) {
         if (!Config.messageEnabled(section, type)) return;
