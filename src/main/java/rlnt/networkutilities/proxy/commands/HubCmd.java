@@ -105,15 +105,6 @@ public class HubCmd extends Command {
                 // send help text
                 Communication.senderCfgMsg(sender, helpText, "nonplayer", null);
             }
-        } else if (args.length > 1) {
-            // undefined amount of parameters was entered, display help
-            if (isPlayer) {
-                // player entered the command
-                Communication.playerCfgMsg(player, helpText, "player", null);
-            } else {
-                // nonplayer entered the command
-                Communication.senderCfgMsg(sender, helpText, "nonplayer", null);
-            }
         } else if (Player.getPlayerNames().contains(subcommand)) {
             // another player's username was entered, send player to hub
             if (isPlayer) {
