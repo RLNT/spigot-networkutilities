@@ -183,11 +183,11 @@ commands:
           &8> &6NetworkUtilities Command Help &8<
           &r &r
           &f Usage:
-          &7 /&ehub &8[&aplayer&7|&aserver&7|&aall&8]
+          &7 /&ehub &8[&a?&7|&aplayer&7|&aserver&7|&aall&8]
           &r &r
       nonplayer:
         enabled: true
-        message: "&cIncorrect usage! &eUsage: &7/&fhub &8[&aplayer&7|&aserver&7|&aall&8]"
+        message: "&cIncorrect usage! &eUsage: &7/&fhub &8[&a?&7|&aplayer&7|&aserver&7|&aall&8]"
 
     hubAlready:
       player:
