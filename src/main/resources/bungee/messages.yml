@@ -226,7 +226,7 @@ commands:
         message: "&e{server} &4has no online players! No players were teleported to the Hub."
       partial:
         enabled: true
-        message: "&eNot all players could be sent to the Hub! &a{success} successful&7, &c{failed} failed"
+        message: "&eNot all players from &c{server} &ecould be sent to the Hub! &a{success} successful&7, &c{failed} failed"
 
     success:
       player:

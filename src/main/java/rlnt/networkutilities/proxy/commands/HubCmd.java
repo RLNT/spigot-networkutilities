@@ -209,6 +209,10 @@ public class HubCmd extends Command {
                         });
                     }
 
+                    // add placeholders
+                    placeholders.put("{success}", connectSuccess.toString());
+                    placeholders.put("{failed}", connectFailed.toString());
+
                     // message player about result
                     if (connectFailed.intValue() == 0) {
                         // all connects were successful
