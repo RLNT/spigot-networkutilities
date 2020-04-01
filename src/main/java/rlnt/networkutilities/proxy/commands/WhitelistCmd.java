@@ -1,232 +1,385 @@
 package rlnt.networkutilities.proxy.commands;
 
-import com.google.common.collect.ImmutableMap;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.config.Configuration;
 import rlnt.networkutilities.proxy.api.ApiException;
 import rlnt.networkutilities.proxy.api.Minecraft;
-import rlnt.networkutilities.proxy.utils.Communication;
-import rlnt.networkutilities.proxy.utils.Config;
-import rlnt.networkutilities.proxy.utils.Player;
-import rlnt.networkutilities.proxy.utils.Whitelist;
+import rlnt.networkutilities.proxy.utils.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+
+// TODO: permission required option kann weg, aus config entfernen und aus allen commands
+// TODO: whitelist save when adding or removing entries
+// TODO: whitelist save when plugin disabling
 
 public class WhitelistCmd extends Command {
 
-	// config entries
-	private static Configuration options = Config.getOptions().getSection("commands").getSection("whitelist");
-	private static Configuration messages = Config.getMessages().getSection("commands").getSection("whitelist");
+    // config entries
+    private static Configuration options = Config.getOptions().getSection("commands").getSection("whitelist");
+    private static Configuration messages = Config.getMessages().getSection("commands").getSection("whitelist");
 
-	public WhitelistCmd() {
-		super("whitelist", getCommandPermission(), getCommandAlias());
-	}
+    public WhitelistCmd() {
+        super("whitelist", "networkutilities.command.whitelist", getCommandAlias());
+    }
 
-	/**
-	 * Will return the command permission which the player needs to use the
-	 * command.
-	 *
-	 * @return the command permission or null if disabled
-	 */
-	private static String getCommandPermission() {
-		if (options.getBoolean("permissionRequired", true)) {
-			return "networkutilities.command.whitelist";
-		} else {
-			return null;
-		}
-	}
+    @Override
+    public void execute(CommandSender sender, String[] args) {
 
-	/**
-	 * Will return the command alias which has the same execution
-	 * functionality like the command name.
-	 *
-	 * @return the command alias
-	 */
-	private static String[] getCommandAlias() {
-		if (options.getStringList("commandAlias").isEmpty()) {
-			return null;
-		} else {
-			List<String> aliasesList = options.getStringList("commandAliases");
-			return aliasesList.toArray(new String[0]);
-		}
-	}
+        // check if the command sender is a player
+        boolean isPlayer;
+        ProxiedPlayer player;
+        if (sender instanceof ProxiedPlayer) {
+            isPlayer = true;
+            player = (ProxiedPlayer) sender;
+        } else {
+            isPlayer = false;
+            player = null;
+        }
 
-	private static UUID getUuidFromPlayerOrUuid(String text) {
-		try {
-			return UUID.fromString(text);
-		} catch (IllegalArgumentException ignored) {
-		}
+        // define the sub command
+        String subcommand;
+        if (args == null || args.length == 0 || args[0].equals("?")) {
+            subcommand = null;
+        } else {
+            subcommand = args[0];
+        }
 
-		try {
-			return Minecraft.getUuid(text);
-		} catch (ApiException e) {
-			return null;
-		}
-	}
+        Configuration helpText = messages.getSection("help");
 
-	private static boolean checkPermission(CommandSender sender, String subpermission) {
-		if (sender instanceof ProxiedPlayer) {
-			ProxiedPlayer player = (ProxiedPlayer) sender;
+        // sub command logic
+        if (subcommand == null) {
+            // nothing or ? has been entered, display help text
+            if (isPlayer) {
+                // player used the command
+                Communication.playerCfgMsg(player, helpText, "player");
+            } else {
+                // nonplayer used the command
+                Communication.senderCfgMsg(sender, helpText, "nonplayer");
+            }
+            return;
+        }
 
-			String permission = getCommandPermission();
-			if (permission == null) {
-				return true;
-			}
+        switch (subcommand) {
+            case "check": {
+                // TODO: make text clickable to add or remove the player to/from the whitelist
+                if (isPlayer) {
+                    // player entered the command
+                    if (!Player.hasPermission(player, "networkutilities.command.whitelist.check")) break;
+                }
 
-			// check permission
-			return Player.hasPermission(player, permission + "." + subpermission);
-		}
+                Configuration check = messages.getSection("check");
 
-		// sender is probably console -> always allow
-		return true;
-	}
+                // check command length - check needs 1 argument
+                if (args.length < 2) {
+                    // argument is missing
+                    if (isPlayer) {
+                        Communication.playerCfgMsg(player, check, "missing");
+                    } else {
+                        Communication.senderCfgMsg(sender, check, "missing");
+                    }
+                    break;
+                } else if (args.length > 2) {
+                    // to many arguments
+                    if (isPlayer) {
+                        Communication.playerCfgMsg(player, check, "toomany");
+                    } else {
+                        Communication.senderCfgMsg(sender, check, "toomany");
+                    }
+                    break;
+                }
 
-	@Override
-	public void execute(CommandSender sender, String[] args) {
-		// check if the command sender is a player
-		boolean isPlayer;
-		ProxiedPlayer player;
-		if (sender instanceof ProxiedPlayer) {
-			isPlayer = true;
-			player = (ProxiedPlayer) sender;
-		} else {
-			isPlayer = false;
-			player = null;
-		}
+                // get uuid from input
+                String input = args[1];
+                UUID uuid;
+                if (General.isUuid(input)) {
+                    uuid = UUID.fromString(input);
 
-		if (checkPermission(sender, "")) {
-			return;
-		}
+                    // check if the uuid points to a player name
+                    try {
+                        Minecraft.getUsername(uuid);
+                    } catch (ApiException e) {
+                        if (isPlayer) {
+                            Communication.playerCfgMsg(player, check, "invalid");
+                        } else {
+                            Communication.senderCfgMsg(sender, check, "invalid");
+                        }
+                        break;
+                    }
+                } else {
+                    // check if the player name points to a uuid
+                    try {
+                        uuid = Minecraft.getUuid(input);
+                    } catch (ApiException e) {
+                        if (isPlayer) {
+                            Communication.playerCfgMsg(player, check, "invalid");
+                        } else {
+                            Communication.senderCfgMsg(sender, check, "invalid");
+                        }
+                        break;
+                    }
+                }
 
-		// define the sub command
-		String subcommand;
-		if (args == null || args.length == 0 || args[0].equals("?") || args[0].equals("help")) {
-			subcommand = null;
-		} else {
-			subcommand = args[0];
-		}
+                // placeholder logic
+                Map<String, String> placeholders = new HashMap<>();
+                placeholders.put("{uuid}", uuid.toString());
 
-		Configuration helpText = messages.getSection("help");
+                // check if whitelisted
+                if (Whitelist.isWhitelisted(uuid)) {
+                    // requested player is whitelisted
+                    if (isPlayer) {
+                        Communication.playerCfgMsg(player, check, "whitelisted", placeholders);
+                    } else {
+                        Communication.senderCfgMsg(sender, check, "whitelisted", placeholders);
+                    }
+                } else {
+                    if (isPlayer) {
+                        Communication.playerCfgMsg(player, check, "notWhitelisted", placeholders);
+                    } else {
+                        Communication.senderCfgMsg(sender, check, "notWhitelisted", placeholders);
+                    }
+                }
 
-		// sub command logic
-		if (subcommand == null) {
-			// nothing, help or ? has been entered, display help text
-			if (isPlayer) {
-				// player used the command
-				Communication.playerCfgMsg(player, helpText, "player");
-			} else {
-				// nonplayer used the command
-				Communication.senderCfgMsg(sender, helpText, "nonplayer");
-			}
+                break;
+            }
+            case "list": {
+                // TODO: make the list pageable
+                // TODO: make GUI for list
+                if (isPlayer) {
+                    // player entered the command
+                    if (!Player.hasPermission(player, "networkutilities.command.whitelist.list")) break;
+                }
 
-			return;
-		}
+                Configuration list = messages.getSection("list");
 
-		// java is retarded and does not have scoped switches
-		UUID id;
-		switch (subcommand) {
-			case "check":
-				// todo: make text clickable to remove or add the player to the whitelist
-				if (checkPermission(sender, "check")) {
-					break;
-				}
+                // check command length - check needs no argument
+                if (args.length > 2){
+                    // to many arguments
+                    if (isPlayer) {
+                        Communication.playerCfgMsg(player, list, "toomany");
+                    } else {
+                        Communication.senderCfgMsg(sender, list, "toomany");
+                    }
+                    break;
+                }
 
-				Configuration checkMessages = messages.getSection("check");
-				if (args.length < 2) {
-					Communication.senderCfgMsg(sender, checkMessages, "missing");
-					break;
-				}
+                // placeholder logic
+                Map<String, String> placeholders = new HashMap<>();
+                placeholders.put("{whitelist}", String.join("\n", Whitelist.getWhitelist()));
 
-				id = getUuidFromPlayerOrUuid(args[1]);
-				if (id == null) {
-					Communication.senderCfgMsg(sender, checkMessages, "invalid");
-					break;
-				}
+                // list the whitelist
+                if (isPlayer) {
+                    Communication.playerCfgMsg(player, list, "player", placeholders);
+                } else {
+                    Communication.senderCfgMsg(sender, list, "console", placeholders);
+                }
 
-				if (Whitelist.isWhitelisted(id)) {
-					Communication.senderCfgMsg(sender, checkMessages, "whitelisted", ImmutableMap.of("{uuid}", id.toString()));
-				} else {
-					Communication.senderCfgMsg(sender, checkMessages, "notwhitelisted", ImmutableMap.of("{uuid}", id.toString()));
-				}
-				break;
-			case "list":
-				// todo: make pageable
-				if (checkPermission(sender, "list")) {
-					break;
-				}
+                break;
+            }
+            case "add": {
+                if (isPlayer) {
+                    // player entered the command
+                    if (!Player.hasPermission(player, "networkutilities.command.whitelist.add")) break;
+                }
 
-				Configuration listMessages = messages.getSection("list");
-				if (isPlayer) {
-					Communication.playerCfgMsg(player, listMessages, "player",
-							ImmutableMap.of("{entries}", String.join("\n", Whitelist.getWhitelist()))
-					);
-				} else {
-					Communication.senderCfgMsg(sender, listMessages, "nonplayer",
-							ImmutableMap.of("{entries}", String.join(",", Whitelist.getWhitelist()))
-					);
-				}
-				break;
-			case "add":
-				if (checkPermission(sender, "add")) {
-					break;
-				}
+                Configuration add = messages.getSection("add");
 
-				Configuration addMessages = messages.getSection("add");
-				if (args.length < 2) {
-					Communication.senderCfgMsg(sender, addMessages, "missing");
-					break;
-				}
+                // check command length - add needs 1 argument
+                if (args.length < 2) {
+                    // argument is missing
+                    if (isPlayer) {
+                        Communication.playerCfgMsg(player, add, "missing");
+                    } else {
+                        Communication.senderCfgMsg(sender, add, "missing");
+                    }
+                    break;
+                } else if (args.length > 2){
+                    // to many arguments
+                    if (isPlayer) {
+                        Communication.playerCfgMsg(player, add, "toomany");
+                    } else {
+                        Communication.senderCfgMsg(sender, add, "toomany");
+                    }
+                    break;
+                }
 
-				id = getUuidFromPlayerOrUuid(args[1]);
-				if (id == null) {
-					Communication.senderCfgMsg(sender, addMessages, "invalid");
-					break;
-				}
+                // get uuid from input
+                String input = args[1];
+                UUID uuid;
+                if (General.isUuid(input)) {
+                    uuid = UUID.fromString(input);
 
-				if (Whitelist.addWhitelist(id)) {
-					Communication.senderCfgMsg(sender, addMessages, "success");
-				} else {
-					Communication.senderCfgMsg(sender, addMessages, "duplicate");
-				}
+                    // check if the uuid points to a player name
+                    try {
+                        Minecraft.getUsername(uuid);
+                    } catch (ApiException e) {
+                        if (isPlayer) {
+                            Communication.playerCfgMsg(player, add, "invalidUuid");
+                        } else {
+                            Communication.senderCfgMsg(sender, add, "invalidUuid");
+                        }
+                        break;
+                    }
+                } else {
+                    // check if the player name points to a uuid
+                    try {
+                        uuid = Minecraft.getUuid(input);
+                    } catch (ApiException e) {
+                        if (isPlayer) {
+                            Communication.playerCfgMsg(player, add, "invalidName");
+                        } else {
+                            Communication.senderCfgMsg(sender, add, "invalidName");
+                        }
+                        break;
+                    }
+                }
 
-				break;
-			case "delete":
-			case "remove":
-				if (checkPermission(sender, "remove")) {
-					break;
-				}
+                // placeholder logic
+                Map<String, String> placeholders = new HashMap<>();
+                placeholders.put("{uuid}", uuid.toString());
 
-				Configuration removeMessages = messages.getSection("remove");
-				if (args.length < 2) {
-					Communication.senderCfgMsg(sender, removeMessages, "missing");
-					break;
-				}
+                // check if player is whitelisted already
+                if (Whitelist.isWhitelisted(uuid)) {
+                    // player is already whitelisted
+                    if (isPlayer) {
+                        Communication.playerCfgMsg(player, add, "already", placeholders);
+                    } else {
+                        Communication.senderCfgMsg(sender, add, "already", placeholders);
+                    }
+                    break;
+                }
 
-				id = getUuidFromPlayerOrUuid(args[1]);
-				if (id == null) {
-					Communication.senderCfgMsg(sender, removeMessages, "invalid");
-					break;
-				}
+                // add to whitelist
+                if (Whitelist.addWhitelist(uuid)) {
+                    // added successfully
+                    if (isPlayer) {
+                        Communication.playerCfgMsg(player, add, "success", placeholders);
+                    } else {
+                        Communication.senderCfgMsg(sender, add, "success", placeholders);
+                    }
+                } else {
+                    // failed to add
+                    if (isPlayer) {
+                        Communication.playerCfgMsg(player, add, "failed", placeholders);
+                    } else {
+                        Communication.senderCfgMsg(sender, add, "failed", placeholders);
+                    }
+                }
 
-				if (Whitelist.removeWhitelist(id)) {
-					Communication.senderCfgMsg(sender, removeMessages, "success");
-				} else {
-					Communication.senderCfgMsg(sender, removeMessages, "nonexistent");
-				}
+                break;
+            }
+            case "remove":
+            case "delete": {
+                if (isPlayer) {
+                    // player entered the command
+                    if (!Player.hasPermission(player, "networkutilities.command.whitelist.remove")) break;
+                }
 
-				break;
-			default:
-				// sender used unknown subcommand
-				if (isPlayer) {
-					// player used the command
-					Communication.playerCfgMsg(player, helpText, "player");
-				} else {
-					// nonplayer used the command
-					Communication.senderCfgMsg(sender, helpText, "nonplayer");
-				}
-		}
-	}
+                Configuration remove = messages.getSection("remove");
+
+                // check command length - remove needs 1 argument
+                if (args.length < 2) {
+                    // argument is missing
+                    if (isPlayer) {
+                        Communication.playerCfgMsg(player, remove, "missing");
+                    } else {
+                        Communication.senderCfgMsg(sender, remove, "missing");
+                    }
+                    break;
+                } else if (args.length > 2){
+                    // to many arguments
+                    if (isPlayer) {
+                        Communication.playerCfgMsg(player, remove, "toomany");
+                    } else {
+                        Communication.senderCfgMsg(sender, remove, "toomany");
+                    }
+                    break;
+                }
+
+                // get uuid from input
+                String input = args[1];
+                UUID uuid;
+                if (General.isUuid(input)) {
+                    uuid = UUID.fromString(input);
+
+                    // check if the uuid points to a player name
+                    try {
+                        Minecraft.getUsername(uuid);
+                    } catch (ApiException e) {
+                        if (isPlayer) {
+                            Communication.playerCfgMsg(player, remove, "invalidUuid");
+                        } else {
+                            Communication.senderCfgMsg(sender, remove, "invalidUuid");
+                        }
+                        break;
+                    }
+                } else {
+                    // check if the player name points to a uuid
+                    try {
+                        uuid = Minecraft.getUuid(input);
+                    } catch (ApiException e) {
+                        if (isPlayer) {
+                            Communication.playerCfgMsg(player, remove, "invalidName");
+                        } else {
+                            Communication.senderCfgMsg(sender, remove, "invalidName");
+                        }
+                        break;
+                    }
+                }
+
+                // placeholder logic
+                Map<String, String> placeholders = new HashMap<>();
+                placeholders.put("{uuid}", uuid.toString());
+
+                // check if player is unwhitelisted already
+                if (!Whitelist.isWhitelisted(uuid)) {
+                    // player is already unwhitelisted
+                    if (isPlayer) {
+                        Communication.playerCfgMsg(player, remove, "already", placeholders);
+                    } else {
+                        Communication.senderCfgMsg(sender, remove, "already", placeholders);
+                    }
+                    break;
+                }
+
+                // remove from whitelist
+                if (Whitelist.removeWhitelist(uuid)) {
+                    // added successfully
+                    if (isPlayer) {
+                        Communication.playerCfgMsg(player, remove, "success", placeholders);
+                    } else {
+                        Communication.senderCfgMsg(sender, remove, "success", placeholders);
+                    }
+                } else {
+                    // failed to add
+                    if (isPlayer) {
+                        Communication.playerCfgMsg(player, remove, "failed", placeholders);
+                    } else {
+                        Communication.senderCfgMsg(sender, remove, "failed", placeholders);
+                    }
+                }
+
+                break;
+            }
+        }
+    }
+
+    /**
+     * Will return the command alias which has the same execution
+     * functionality like the command name.
+     *
+     * @return the command alias
+     */
+    private static String[] getCommandAlias() {
+        if (options.getStringList("commandAlias").isEmpty()) {
+            return null;
+        } else {
+            List<String> aliasesList = options.getStringList("commandAliases");
+            return aliasesList.toArray(new String[0]);
+        }
+    }
 }
