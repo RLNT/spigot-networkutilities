@@ -5,13 +5,13 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import rlnt.networkutilities.proxy.NetworkUtilities;
+import rlnt.networkutilities.proxy.api.ApiException;
+import rlnt.networkutilities.proxy.api.Minecraft;
 
 import java.net.Proxy;
 import java.net.ProxySelector;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.regex.Pattern;
 
 public enum General {
     ;
@@ -36,6 +36,17 @@ public enum General {
      */
     public static String colorize(String message) {
         return ChatColor.translateAlternateColorCodes('&', message);
+    }
+
+    /**
+     * Will check if a String is convertable to a valid UUID.
+     *
+     * @param input the uuid string
+     * @return true if the string is valid, else false
+     */
+    public static boolean isUuid(String input) {
+        Pattern p = Pattern.compile("[0-9a-f]{8}-[0-9a-f]{4}-[34][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}");
+        return p.matcher(input).matches();
     }
 
     /**
