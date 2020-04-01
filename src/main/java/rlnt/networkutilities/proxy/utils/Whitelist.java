@@ -46,6 +46,7 @@ public enum Whitelist {
      * @return boolean if the UUID was added
      */
     public static boolean addWhitelist(UUID uuid) {
+        // TODO: save the whitelist to file after adding
         return whitelist.add(uuid.toString());
     }
 
@@ -56,6 +57,7 @@ public enum Whitelist {
      * @return boolean if the UUID was removed
      */
     public static boolean removeWhitelist(UUID uuid) {
+        // TODO: save the whitelist to file after removing
         return whitelist.remove(uuid.toString());
     }
 }
