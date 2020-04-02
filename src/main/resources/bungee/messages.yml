@@ -153,15 +153,6 @@ commands:
 
   # general command messages
   general:
-    # This message is sent to anything that is not a player when
-    # trying to execute a player only command e.g. the console.
-    #  > setting 'enabled' to false will completely disable the message
-    #  > setting 'enabled' to true but setting the message to an empty
-    #    string ("") will also disable the message completely
-    playerOnly:
-      enabled: true
-      message: "&4This command is only executable by a player!"
-
     # This message is sent to a player not having the required
     # permission to execute a command.
     #  > setting 'enabled' to false will completely disable the message
@@ -175,94 +166,281 @@ commands:
 
   # hub command specific messages
   hub:
+    # all messages for the '?' (help) sub command
     help:
+      # This message is sent to a player when they use the ? sub command.
+      # It's kinda the help page for the command.
+      # Available placeholders:
+      #  none
       player:
         enabled: true
         message: |-
           &r &r
           &8> &6NetworkUtilities Command Help &8<
           &r &r
-          &f Usage:
-          &7 /&ehub &8[&a?&7|&aplayer&7|&aserver&7|&aall&8]
+          &7 /&ehub &a?
+          &7  Will show this command help text.
+          &7 /&ehub
+          &7  Will teleport yourself to the hub.
+          &7 /&ehub &8<&aplayer&8>
+          &7  Will teleport another player to the hub.
+          &7 /&ehub &8<&aserver&8>
+          &7  Will teleport a whole server to the hub.
+          &7 /&ehub &8<&aall&7|&anetwork&8>
+          &7  Will teleport the whole network to the hub.
           &r &r
-      nonplayer:
-        enabled: true
-        message: "&cIncorrect usage! &eUsage: &7/&fhub &8[&a?&7|&aplayer&7|&aserver&7|&aall&8]"
 
-    same:
-      player:
+      # This message is sent to a nonplayer e.g. the console when they use the ? sub command.
+      # It's kinda the help page for the command.
+      # Available placeholders:
+      #  none
+      console:
+        enabled: true
+        message: "&eHub command usage: &7/&fhub &8<&a?&7|&aplayer&7|&aserver&7|&aall&8>"
+
+    # These messages are sent to a player when they use the hub command without a sub command
+    # which means they want to teleport themselves.
+    self:
+      # This message is displayed when the player already is on the hub server.
+      # Available placeholders:
+      #  none
+      server:
         enabled: true
         message: "&4You are in the Hub already!"
-      other:
-        enabled: true
-        message: "&e{player} &4is in the Hub already!"
-      nonplayer:
-        enabled: true
-        message: "&e{player} &4is in the Hub already!"
-      server:
-        enabled: true
-        message: "&4You cannot enter the the Hub as origin server!"
 
-    offline:
-      player:
-        enabled: true
-        message: "&4Could not send you to the Hub! It seems to be offline!"
-      other:
-        enabled: true
-        message: "&e{player} &4couldn't be sent to the Hub! It seems to be offline!"
-      nonplayer:
-        enabled: true
-        message: "&e{player} &4couldn't be sent to the Hub! It seems to be offline!"
-      server:
-        enabled: true
-        message: "&e{server} &4couldn't be sent to the Hub! The hub seems to be offline!"
-
-    success:
-      player:
-        enabled: true
-        message: "&aYou have been teleported to the Hub!"
-      other:
-        enabled: true
-        message: "&e{player} &ahas been teleported to the Hub!"
-      nonplayer:
-        enabled: true
-        message: "&e{player} &ahas been teleported to the Hub!"
-      server:
-        enabled: true
-        message: "&aAll players of &e{server} &awere teleported to the Hub!"
-
-    fail:
-      player:
-        enabled: true
-        message: "&4Could not send you to the Hub!"
-      other:
-        enabled: true
-        message: "&e{player} &4couldn't be sent to the Hub!"
-      nonplayer:
-        enabled: true
-        message: "&e{player} &4couldn't be sent to the Hub!"
-      server:
-        enabled: true
-        message: "&4No players of &e{server} &4were able to be teleported to the Hub!"
-
-    server:
+      # This message is displayed when the teleport was cancelled because the hub server is offline.
+      # Available placeholders:
+      #  none
       offline:
         enabled: true
-        message: "&e{server} &4seems to be offline! No players were teleported to the Hub."
-      empty:
-        enabled: true
-        message: "&e{server} &4has no online players! No players were teleported to the Hub."
-      partial:
-        enabled: true
-        message: "&eNot all players from &c{server} &ecould be sent to the Hub! &a{success} successful&7, &c{failed} failed"
+        message: "&4The Hub server seems to be offline!"
 
-    network:
+      # This message is displayed when the player successfully teleported to the Hub.
+      # Available placeholders:
+      #  none
+      success:
+        enabled: true
+        message: "&aYou have been teleported to the Hub!"
+
+      # This message is displayed when the player couldn't be connected to the Hub server.
+      # It can be caused by several reasons. It just tells the player that it didn't work.
+      # Available placeholders:
+      #  none
+      failed:
+        enabled: true
+        message: "&cYou couldn't be connected to the Hub!"
+
+    # These messages are sent to a player when they use the hub command on another player.
+    other:
+      # This message is displayed when too many arguments where entered for the command.
+      # Available placeholders:
+      #  none
+      toomany:
+        enabled: true
+        message: "&4You entered too many arguments! &fUsage: &7/&ehub &7<&aplayer&7>"
+
+      # This message is displayed when the targeted player already is on the hub server.
+      # Available placeholders:
+      #  > {player} - the name of the targeted player that should be teleported
+      #  > {server} - the name of the server the targeted player was on before the teleport
+      server:
+        enabled: true
+        message: "&4Player &e{player} &4is on the Hub server already!"
+
+      # This message is displayed when the teleport of the targeted player was cancelled because the hub server is offline.
+      # Available placeholders:
+      #  > {player} - the name of the targeted player that should be teleported
+      #  > {server} - the name of the server the targeted player was on before the teleport
+      offline:
+        enabled: true
+        message: "&4Player &e{player} &4could not be teleported from the server &a{server} &4to the Hub. It seems to be offline!"
+
+      # This message is displayed when the teleport of the targeted player was successful.
+      # Available placeholders:
+      #  > {player} - the name of the targeted player that should be teleported
+      #  > {server} - the name of the server the targeted player was on before the teleport
+      success:
+        enabled: true
+        message: "&aPlayer &e{player} &ahas been teleported from the server &c{server} &ato the Hub!"
+
+      # This message is displayed when the teleport of the targeted player failed.
+      # It can be caused by several reasons. It just tells the player that it didn't work.
+      # Available placeholders:
+      #  > {player} - the name of the targeted player that should be teleported
+      #  > {server} - the name of the server the targeted player was on before the teleport
+      failed:
+        enabled: true
+        message: "&cYou couldn't be connected to the Hub!"
+
+      # These messages are sent to the targeted players of the hub command.
+      target:
+        # This message is displayed to a targeted player that was teleported successfully.
+        # Available placeholders:
+        #  > {player} - the name of the targeted player
+        #  > {server} - the name of the server the targeted player was on before the teleport
+        #  > {executor} - the name of the player who executed the hub command
+        success:
+          enabled: true
+          message: "&f{player}&a, you were teleported from the server &e{server} &ato the Hub by &e{executor}&a!"
+
+        # This message is displayed to a targeted player that was failed to teleport.
+        # Available placeholders:
+        #  > {player} - the name of the targeted player
+        #  > {server} - the name of the server the targeted player was on before the teleport
+        #  > {executor} - the name of the player who executed the hub command
+        failed:
+          enabled: true
+          message: "&f{player}&c, &e{executor} &ctried to teleport you from the server &e{server} &cto the Hub but it failed!"
+
+    # These messages are sent to a player when they use the hub command on a server.
+    server:
+      # This message is displayed when too many arguments where entered for the command.
+      # Available placeholders:
+      #  none
+      toomany:
+        enabled: true
+        message: "&4You entered too many arguments! &fUsage: &7/&ehub &7<&aserver&7>"
+
+      # This message is displayed when the targeted server already is the hub server.
+      # Available placeholders:
+      #  none
+      server:
+        enabled: true
+        message: "&4You can't use the Hub server as teleport origin server!"
+
+      # This message is displayed when the origin server of the teleport has no players.
+      # Available placeholders:
+      #  > {server} - the name of the teleport origin server
       empty:
         enabled: true
-        message: "$4There are no players in the network! No players were teleported to the Hub."
+        message: "&4The origin server &e{server} &4is empty! No players were teleported."
+
+      # This message is displayed when the origin server of the teleport is offline.
+      # Available placeholders:
+      #  > {server} - the name of the server the targeted player was on before the teleport
+      originOffline:
+        enabled: true
+        message: "&4The origin server &e{server} &4is offline! No players were teleported."
+
+      # This message is displayed when the teleport of the targeted player was cancelled because the hub server is offline.
+      # Available placeholders:
+      #  > {player} - the name of the targeted player that should be teleported
+      #  > {server} - the name of the server the targeted player was on before the teleport
+      hubOffline:
+        enabled: true
+        message: "&4Player &e{player} &4could not be teleported from the server &a{server} &4to the Hub. It seems to be offline!"
+
+      # This message is displayed when all players of the origin server were teleported successfully.
+      # Available placeholders:
+      #  > {server} - the name of the server the targeted player was on before the teleport
+      success:
+        enabled: true
+        message: "&aAll players from the server &e{server} &awere teleported to the Hub!"
+
+      # This message is displayed when some players of the origin server were teleported successfully
+      # and some failed to be teleported.
+      # Available placeholders:
+      #  > {server} - the name of the server the targeted player was on before the teleport
+      #  > {success} - the amount of players that were successfully teleported
+      #  > {failed} - the amount of players that failed to be teleported
       partial:
         enabled: true
-        message: "&eNot all players from the network could be sent to the Hub! &a{success} successful&7, &c{failed} failed"
+        message: "&eNot all players of the server &a{server} &ecould be teleported to the Hub! &fSuccessful: &e{success} &7| &fFailed: &e{failed}"
+
+      # This message is displayed when no players of the origin server were teleported.
+      # It can be caused by several reasons. It just tells the player that it didn't work.
+      # Available placeholders:
+      #  > {server} - the name of the server the targeted player was on before the teleport
+      failed:
+        enabled: true
+        message: "&cNo players from the server &e{server} &ccould be teleported to the Hub!"
+
+      # These messages are sent to the targeted players of the hub command.
+      target:
+        # This message is displayed to a targeted player that was teleported successfully.
+        # Available placeholders:
+        #  > {player} - the name of the targeted
+        #  > {server} - the name of the server the targeted player was on before the teleport
+        #  > {executor} - the name of the player who executed the hub command
+        success:
+          enabled: true
+          message: "&f{player}&a, you were teleported from the server &e{server} &ato the Hub by &e{executor}&a!"
+
+        # This message is displayed to a targeted player that was failed to teleport.
+        # Available placeholders:
+        #  > {player} - the name of the targeted
+        #  > {server} - the name of the server the targeted player was on before the teleport
+        #  > {executor} - the name of the player who executed the hub command
+        failed:
+          enabled: true
+          message: "&f{player}&c, &e{executor} &ctried to teleport you from the server &e{server} &cto the Hub but it failed!"
+
+    # These messages are sent to a player when they use the hub command on the network.
+    network:
+      # This message is displayed when too many arguments where entered for the command.
+      # Available placeholders:
+      #  none
+      toomany:
+        enabled: true
+        message: "&4You entered too many arguments! &fUsage: &7/&ehub &7<&aall&8|&anetwork&7>"
+
+      # This message is displayed when the network has no players or the only player
+      # is the sender of the command.
+      empty:
+        enabled: true
+        message: "&4The network is empty or you are the only one online."
+
+      # This message is displayed when the origin server of the teleport is offline.
+      # Available placeholders:
+      #  > {server} - the name of the server the targeted player was on before the teleport
+      offline:
+        enabled: true
+        message: "&4The origin server &e{server} &4is offline! No players were teleported."
+
+      # This message is displayed when all players of the origin server were teleported successfully.
+      # Available placeholders:
+      #  > {server} - the name of the server the targeted player was on before the teleport
+      success:
+        enabled: true
+        message: "&aAll players from the server &e{server} &awere teleported to the Hub!"
+
+      # This message is displayed when some players of the origin server were teleported successfully
+      # and some failed to be teleported.
+      # Available placeholders:
+      #  > {server} - the name of the server the targeted player was on before the teleport
+      #  > {success} - the amount of players that were successfully teleported
+      #  > {failed} - the amount of players that failed to be teleported
+      partial:
+        enabled: true
+        message: "&eNot all players of the server &a{server} &ecould be teleported to the Hub! &fSuccessful: &e{success} &7| &fFailed: &e{failed}"
+
+      # This message is displayed when no players of the origin server were teleported.
+      # It can be caused by several reasons. It just tells the player that it didn't work.
+      # Available placeholders:
+      #  > {server} - the name of the server the targeted player was on before the teleport
+      failed:
+        enabled: true
+        message: "&cNo players from the server &e{server} &ccould be teleported to the Hub!"
+
+      # These messages are sent to the targeted players of the hub command.
+      target:
+        # This message is displayed to a targeted player that was teleported successfully.
+        # Available placeholders:
+        #  > {player} - the name of the targeted
+        #  > {server} - the name of the server the targeted player was on before the teleport
+        #  > {executor} - the name of the player who executed the hub command
+        success:
+          enabled: true
+          message: "&f{player}&a, you were teleported from the server &e{server} &ato the Hub by &e{executor}&a!"
+
+        # This message is displayed to a targeted player that was failed to teleport.
+        # Available placeholders:
+        #  > {player} - the name of the targeted
+        #  > {server} - the name of the server the targeted player was on before the teleport
+        #  > {executor} - the name of the player who executed the hub command
+        failed:
+          enabled: true
+          message: "&f{player}&c, &e{executor} &ctried to teleport you from the server &e{server} &cto the Hub but it failed!"
 
   # whitelist command specific messages
   whitelist:
