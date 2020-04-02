@@ -17,9 +17,7 @@ import rlnt.networkutilities.proxy.utils.General;
 import rlnt.networkutilities.proxy.utils.Player;
 import rlnt.networkutilities.proxy.utils.Whitelist;
 
-// TODO: UUID based Whitelist/Blacklist
 // TODO: automatic reconnect
-// TODO: reload command (messages only to prevent clashing with hub server option)
 // TODO: block commands
 
 public class NetworkUtilities extends Plugin {

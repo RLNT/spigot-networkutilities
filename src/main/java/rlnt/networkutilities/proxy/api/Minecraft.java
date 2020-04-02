@@ -118,12 +118,11 @@ public enum Minecraft {
      * Get the username of a player by UUID.
      *
      * @param uuid {@link UUID} of the player
-     * @return the player name as {@link String} or null if UUID was not found
      */
-    public static String getUsername(UUID uuid) throws ApiException {
+    public static void getUsername(UUID uuid) throws ApiException {
         // check cache
         String username = uuidUsernameCache.getIfPresent(uuid);
-        if (username != null) return username;
+        if (username != null) return;
 
         // not in cache
         String id = getIdFromUuid(uuid);
@@ -148,7 +147,6 @@ public enum Minecraft {
         usernameUuidCache.put(username, uuid);
         uuidUsernameCache.put(uuid, username);
 
-        return username;
     }
 
     public static UUID getUuid(String username) throws ApiException {
