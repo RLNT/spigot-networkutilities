@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class HubCmd extends Command {
@@ -26,8 +27,6 @@ public class HubCmd extends Command {
     public HubCmd() {
         super(getCommandName(), permission, getCommandAlias());
     }
-
-    // TODO: implementieren dass die teleportierten Spieler auch Nachrichten erhalten
 
     @Override
     public void execute(CommandSender sender, String[] args) {
@@ -47,160 +46,236 @@ public class HubCmd extends Command {
         String subcommand;
         if (args == null || args.length == 0) {
             subcommand = null;
-        } else if (args[0].equals("?") || args.length > 1) {
+        } else if (args[0].equals("?")) {
             subcommand = "?";
         } else {
             subcommand = args[0];
         }
 
-        Configuration helpText = messages.getSection("helpText");
-        Configuration hubAlready = messages.getSection("hubAlready");
-        Configuration hubOffline = messages.getSection("hubOffline");
-        Configuration hubServer = messages.getSection("server");
-        Configuration hubNetwork = messages.getSection("network");
-        Configuration hubSuccess = messages.getSection("success");
-        Configuration hubFailed = messages.getSection("fail");
+        // messages
+        Configuration help = messages.getSection("help");
 
         // sub command logic
         if (subcommand == null) {
             // nothing was entered, teleport to hub requested
             // if player -> teleport to hub
-            // if nonplayer -> show help text
+            // if nonplayer -> nonplayer can't be teleported -> show help
             if (isPlayer) {
-                // a player entered the command and should be teleported
-                if (Player.hasPermission(player, permission + ".self")) {
-                    // player has permission to use the command
-                    String currentServer = player.getServer().getInfo().getName();
-                    if (currentServer.equals(targetServer)) {
-                        // player is already on the hub server
-                        Communication.playerCfgMsg(player, hubAlready, "player");
-                    } else {
-                        // player is sent to hub
-                        // check if the target server is online
-                        target.ping((pingResult, pingError) -> {
-                            if (pingError == null) {
-                                // hub is online, connect player
-                                player.connect(target, (connectResult, connectError) -> {
-                                    if (connectError == null) {
-                                        // successfully connected
-                                        Communication.playerCfgMsg(player, hubSuccess, "player");
-                                    } else {
-                                        // connection failed
-                                        Communication.playerCfgMsg(player, hubFailed, "player");
-                                    }
-                                });
-                            } else {
-                                // hub is not online
-                                Communication.playerCfgMsg(player, hubOffline, "player");
-                            }
-                        });
-                    }
-                }
-            } else {
-                // a nonplayer entered the command e.g. console
-                // send help text
-                Communication.senderCfgMsg(sender, helpText, "nonplayer");
-            }
-        } else if (Player.getPlayerNames().contains(subcommand)) {
-            // another player's username was entered, send player to hub
-            if (isPlayer) {
-                // check permission if command sender was a player
-                if (!Player.hasPermission(player, permission + ".other")) return;
-            }
+                // check permission
+                if (!Player.hasPermission(player, permission + ".self")) return;
 
-            ProxiedPlayer targetPlayer = Player.getPlayerByName(subcommand);
-            String currentServer = targetPlayer.getServer().getInfo().getName();
-            Map<String, String> placeholders = new HashMap<>();
-            placeholders.put("{player}", targetPlayer.getName());
-            if (currentServer.equals(targetServer)) {
-                // target player is already on the hub server
-                if (isPlayer) {
-                    Communication.playerCfgMsg(player, hubAlready, "other", placeholders);
-                } else {
-                    Communication.senderCfgMsg(sender, hubAlready, "nonplayer", placeholders);
+                // messages
+                Configuration self = messages.getSection("self");
+
+                // variables
+                String currentServer = player.getServer().getInfo().getName();
+
+                // check if player already is in the hub
+                if (currentServer.equals(targetServer)) {
+                    // player is already on the hub server
+                    Communication.playerCfgMsg(player, self, "server");
+                    return;
                 }
-            } else {
-                // target player is sent to hub
-                // check if the target server is online
+
+                // connect player to hub
                 target.ping((pingResult, pingError) -> {
                     if (pingError == null) {
-                        // hub is online, connect target player
-                        targetPlayer.connect(target, (connectResult, connectError) -> {
+                        // hub is online, connect player
+                        player.connect(target, (connectResult, connectError) -> {
                             if (connectError == null) {
                                 // successfully connected
-                                if (isPlayer) {
-                                    Communication.playerCfgMsg(player, hubSuccess, "other", placeholders);
-                                } else {
-                                    Communication.senderCfgMsg(sender, hubSuccess, "nonplayer", placeholders);
-                                }
+                                Communication.playerCfgMsg(player, self, "success");
                             } else {
                                 // connection failed
-                                if (isPlayer) {
-                                    Communication.playerCfgMsg(player, hubFailed, "other", placeholders);
-                                } else {
-                                    Communication.senderCfgMsg(sender, hubFailed, "nonplayer", placeholders);
-                                }
+                                Communication.playerCfgMsg(player, self, "failed");
                             }
                         });
                     } else {
                         // hub is not online
-                        if (isPlayer) {
-                            Communication.playerCfgMsg(player, hubOffline, "other", placeholders);
-                        } else {
-                            Communication.senderCfgMsg(sender, hubOffline, "nonplayer", placeholders);
-                        }
+                        Communication.playerCfgMsg(player, self, "offline");
                     }
                 });
+            } else {
+                // nonplayer sent the command, show help
+                Communication.senderCfgMsg(sender, help, "console");
             }
-        } else if (Server.getServerNames().contains(subcommand)) {
-            // a server's name was entered, send players to hub
+        } else if (Player.getPlayerNames().contains(subcommand)) {
+            // another player's username was entered, send player to hub
             if (isPlayer) {
-                // check permission if command sender was a player
-                if (!Player.hasPermission(player, permission + ".server")) return;
+                // check permission
+                if (!Player.hasPermission(player, permission + ".other")) return;
             }
 
-            if (subcommand.equals(targetServer)) {
-                // entered hub as server
+            // messages
+            Configuration other = messages.getSection("other");
+            Configuration toTarget = other.getSection("target");
+
+            // check args
+            if (args.length > 1) {
                 if (isPlayer) {
-                    Communication.playerCfgMsg(player, hubAlready, "server");
+                    Communication.playerCfgMsg(player, other, "toomany");
                 } else {
-                    Communication.senderCfgMsg(sender, hubAlready, "server");
+                    Communication.senderCfgMsg(sender, other, "toomany");
+                }
+            }
+
+            // variables
+            ProxiedPlayer targetPlayer = Player.getPlayerByName(subcommand);
+            String currentServer = targetPlayer.getServer().getInfo().getName();
+
+            // placeholder logic
+            Map<String, String> placeholders = new HashMap<>();
+            placeholders.put("{player}", targetPlayer.getName());
+            placeholders.put("{server}", currentServer);
+
+            // check if targeted player is already in the hub
+            if (currentServer.equals(targetServer)) {
+                // targeted player is already on the hub server
+                if (isPlayer) {
+                    Communication.playerCfgMsg(player, other, "server", placeholders);
+                } else {
+                    Communication.senderCfgMsg(sender, other, "server", placeholders);
                 }
                 return;
             }
 
-            Collection<ProxiedPlayer> players = Player.getPlayersByServer(subcommand);
-            ServerInfo server = Server.getServerByName(subcommand);
-            Map<String, String> placeholders = new HashMap<>();
-            placeholders.put("{server}", server.getName());
-
-            // check if the target server is online
+            // connect targeted player to hub
             target.ping((pingResult, pingError) -> {
                 if (pingError == null) {
-                    // hub is online
-                    // check if the origin server has players
-                    if (players.isEmpty()) {
-                        // server is empty
-                        if (isPlayer) {
-                            Communication.playerCfgMsg(player, hubServer, "empty", placeholders);
-                        } else {
-                            Communication.senderCfgMsg(sender, hubServer, "empty", placeholders);
-                        }
-                        return;
+                    // hub is online, connect targeted player
+                    // target placeholder logic
+                    Map<String, String> targetPlaceholders = new HashMap<>(placeholders);
+                    targetPlaceholders.put("{player}", targetPlayer.getName());
+                    if (isPlayer) {
+                        targetPlaceholders.put("{executor}", player.getName());
+                    } else {
+                        targetPlaceholders.put("{executor}", "console");
                     }
 
-                    // connect target players
+                    targetPlayer.connect(target, (connectResult, connectError) -> {
+                        if (connectError == null) {
+                            // successfully connected
+                            if (isPlayer) {
+                                Communication.playerCfgMsg(player, other, "success", placeholders);
+                            } else {
+                                Communication.senderCfgMsg(sender, other, "success", placeholders);
+                            }
+                            // send message to targeted player
+                            Communication.playerCfgMsg(targetPlayer, toTarget, "success", targetPlaceholders);
+                        } else {
+                            // connection failed
+                            if (isPlayer) {
+                                Communication.playerCfgMsg(player, other, "failed", placeholders);
+                            } else {
+                                Communication.senderCfgMsg(sender, other, "failed", placeholders);
+                            }
+                            // send message to targeted player
+                            Communication.playerCfgMsg(targetPlayer, toTarget, "failed", targetPlaceholders);
+                        }
+                    });
+                } else {
+                    // hub is not online
+                    if (isPlayer) {
+                        Communication.playerCfgMsg(player, other, "offline", placeholders);
+                    } else {
+                        Communication.senderCfgMsg(sender, other, "offline", placeholders);
+                    }
+                }
+            });
+        } else if (Server.getServerNames().contains(subcommand)) {
+            // a server's name was entered, send server players to hub
+            if (isPlayer) {
+                // check permission
+                if (!Player.hasPermission(player, permission + ".server")) return;
+            }
+
+            // messages
+            Configuration server = messages.getSection("server");
+            Configuration toTarget = server.getSection("target");
+
+            // check args
+            if (args.length > 1) {
+                if (isPlayer) {
+                    Communication.playerCfgMsg(player, server, "toomany");
+                } else {
+                    Communication.senderCfgMsg(sender, server, "toomany");
+                }
+            }
+
+            // check if origin is equal to target
+            if (subcommand.equals(targetServer)) {
+                // entered hub as server
+                if (isPlayer) {
+                    Communication.playerCfgMsg(player, server, "server");
+                } else {
+                    Communication.senderCfgMsg(sender, server, "server");
+                }
+                return;
+            }
+
+            // variables
+            Collection<ProxiedPlayer> players = Player.getPlayersByServer(subcommand);
+            ServerInfo currentServer = Server.getServerByName(subcommand);
+
+            // placeholder logic
+            Map<String, String> placeholders = new HashMap<>();
+            placeholders.put("{server}", currentServer.getName());
+
+            // check if the origin server is online
+            AtomicBoolean originOnline = new AtomicBoolean(false);
+            currentServer.ping((result, error) -> {
+                if (error == null) {
+                    originOnline.set(true);
+                } else {
+                    originOnline.set(false);
+                }
+            });
+            if (!originOnline.get()) {
+                if (isPlayer) {
+                    Communication.playerCfgMsg(player, server, "originOffline", placeholders);
+                } else {
+                    Communication.senderCfgMsg(sender, server, "originOffline", placeholders);
+                }
+                return;
+            }
+
+            // check if the origin server has players
+            if (players.isEmpty()) {
+                if (isPlayer) {
+                    Communication.playerCfgMsg(player, server, "empty", placeholders);
+                } else {
+                    Communication.senderCfgMsg(sender, server, "empty", placeholders);
+                }
+                return;
+            }
+
+            // connect server players to hub
+            target.ping((pingResult, pingError) -> {
+                if (pingError == null) {
+                    // hub is online, connect players
                     AtomicInteger connectSuccess = new AtomicInteger();
                     AtomicInteger connectFailed = new AtomicInteger();
+
+                    // target placeholder logic
+                    Map<String, String> targetPlaceholders = new HashMap<>(placeholders);
+                    if (isPlayer) {
+                        targetPlaceholders.put("{executor}", player.getName());
+                    } else {
+                        targetPlaceholders.put("{executor}", "console");
+                    }
+
+                    // connect players
                     for (ProxiedPlayer p : players) {
+                        // add target placeholder
+                        targetPlaceholders.put("{player}", p.getName());
                         p.connect(target, (connectResult, connectError) -> {
                             if (connectError == null) {
                                 // successfully connected
                                 connectSuccess.getAndIncrement();
-                                // TODO: send message to targeted player that he was moved to hub
+                                Communication.playerCfgMsg(p, toTarget, "success", targetPlaceholders);
                             } else {
                                 connectFailed.getAndIncrement();
-                                // TODO: send message to targeted playeer that moving to hub failed
+                                Communication.playerCfgMsg(p, toTarget, "failed", targetPlaceholders);
                             }
                         });
                     }
@@ -213,41 +288,55 @@ public class HubCmd extends Command {
                     if (connectFailed.intValue() == 0) {
                         // all connects were successful
                         if (isPlayer) {
-                            Communication.playerCfgMsg(player, hubSuccess, "server", placeholders);
+                            Communication.playerCfgMsg(player, server, "success", placeholders);
                         } else {
-                            Communication.senderCfgMsg(sender, hubSuccess, "server", placeholders);
+                            Communication.senderCfgMsg(sender, server, "success", placeholders);
                         }
                     } else if (connectSuccess.intValue() == 0) {
                         // all connects failed
                         if (isPlayer) {
-                            Communication.playerCfgMsg(player, hubFailed, "server", placeholders);
+                            Communication.playerCfgMsg(player, server, "failed", placeholders);
                         } else {
-                            Communication.senderCfgMsg(sender, hubFailed, "server", placeholders);
+                            Communication.senderCfgMsg(sender, server, "failed", placeholders);
                         }
                     } else {
                         // partial transfer
                         if (isPlayer) {
-                            Communication.playerCfgMsg(player, hubServer, "partial", placeholders);
+                            Communication.playerCfgMsg(player, server, "partial", placeholders);
                         } else {
-                            Communication.senderCfgMsg(sender, hubServer, "partial", placeholders);
+                            Communication.senderCfgMsg(sender, server, "partial", placeholders);
                         }
                     }
                 } else {
                     // hub is not online
                     if (isPlayer) {
-                        Communication.playerCfgMsg(player, hubOffline, "server", placeholders);
+                        Communication.playerCfgMsg(player, server, "hubOffline", placeholders);
                     } else {
-                        Communication.senderCfgMsg(sender, hubOffline, "server", placeholders);
+                        Communication.senderCfgMsg(sender, server, "hubOffline", placeholders);
                     }
                 }
             });
         } else if (subcommand.equals("all") || subcommand.equals("network")) {
-            // network was entered, send network to hub
+            // network was entered, send network players to hub
             if (isPlayer) {
-                // check permission if command sender was a player
+                // check permission
                 if (!Player.hasPermission(player, permission + ".network")) return;
             }
 
+            // messages
+            Configuration network = messages.getSection("network");
+            Configuration toTarget = network.getSection("target");
+
+            // check args
+            if (args.length > 1) {
+                if (isPlayer) {
+                    Communication.playerCfgMsg(player, network, "toomany");
+                } else {
+                    Communication.senderCfgMsg(sender, network, "toomany");
+                }
+            }
+
+            // variables
             Collection<ProxiedPlayer> players = Player.getNetworkPlayers();
             players.removeAll(Player.getPlayersByServer(targetServer));
 
@@ -255,29 +344,40 @@ public class HubCmd extends Command {
             if (players.size() <= 1) {
                 // no player or only the sender was found in the network
                 if (isPlayer) {
-                    Communication.playerCfgMsg(player, hubNetwork, "empty");
+                    Communication.playerCfgMsg(player, network, "empty");
                 } else {
-                    Communication.senderCfgMsg(sender, hubNetwork, "empty");
+                    Communication.senderCfgMsg(sender, network, "empty");
                 }
             }
 
-            // check if the target server is online
+            // send players to hub
             target.ping((pingResult, pingError) -> {
                 if (pingError == null) {
                     // hub is online
-
-                    // connect target players
                     AtomicInteger connectSuccess = new AtomicInteger();
                     AtomicInteger connectFailed = new AtomicInteger();
+
+                    // target placeholder logic
+                    Map<String, String> targetPlaceholders = new HashMap<>();
+                    if (isPlayer) {
+                        targetPlaceholders.put("{executor}", player.getName());
+                    } else {
+                        targetPlaceholders.put("{executor}", "console");
+                    }
+
+                    // connect target players
                     for (ProxiedPlayer p : players) {
+                        // add target placeholders
+                        targetPlaceholders.put("{player}", p.getName());
+                        targetPlaceholders.put("{server}", p.getServer().getInfo().getName());
                         p.connect(target, (connectResult, connectError) -> {
                             if (connectError == null) {
                                 // successfully connected
                                 connectSuccess.getAndIncrement();
-                                // TODO: send message to targeted player that he was moved to hub
+                                Communication.playerCfgMsg(p, toTarget, "success", targetPlaceholders);
                             } else {
                                 connectFailed.getAndIncrement();
-                                // TODO: send message to targeted playeer that moving to hub failed
+                                Communication.playerCfgMsg(p, toTarget, "failed", targetPlaceholders);
                             }
                         });
                     }
@@ -286,34 +386,41 @@ public class HubCmd extends Command {
                     if (connectFailed.intValue() == 0) {
                         // all connects were successful
                         if (isPlayer) {
-                            Communication.playerCfgMsg(player, hubSuccess, "network");
+                            Communication.playerCfgMsg(player, network, "success");
                         } else {
-                            Communication.senderCfgMsg(sender, hubSuccess, "network");
+                            Communication.senderCfgMsg(sender, network, "success");
                         }
                     } else if (connectSuccess.intValue() == 0) {
                         // all connects failed
                         if (isPlayer) {
-                            Communication.playerCfgMsg(player, hubFailed, "network");
+                            Communication.playerCfgMsg(player, network, "failed");
                         } else {
-                            Communication.senderCfgMsg(sender, hubFailed, "network");
+                            Communication.senderCfgMsg(sender, network, "failed");
                         }
                     } else {
                         // partial transfer
                         if (isPlayer) {
-                            Communication.playerCfgMsg(player, hubNetwork, "partial");
+                            Communication.playerCfgMsg(player, network, "partial");
                         } else {
-                            Communication.senderCfgMsg(sender, hubNetwork, "partial");
+                            Communication.senderCfgMsg(sender, network, "partial");
                         }
                     }
                 } else {
                     // hub is not online
                     if (isPlayer) {
-                        Communication.playerCfgMsg(player, hubOffline, "network");
+                        Communication.playerCfgMsg(player, network, "offline");
                     } else {
-                        Communication.senderCfgMsg(sender, hubOffline, "network");
+                        Communication.senderCfgMsg(sender, network, "offline");
                     }
                 }
             });
+        } else {
+            // '?' or an unregistered sub command was entered, show help
+            if (isPlayer) {
+                Communication.playerCfgMsg(player, help, "player");
+            } else {
+                Communication.senderCfgMsg(sender, help, "console");
+            }
         }
     }
 
@@ -343,9 +450,9 @@ public class HubCmd extends Command {
 
         String commandName = options.getString("commandName");
         if (commandName == null || commandName.isEmpty()) {
-            return "networkutilities.command.hub";
+            return "nwutils.command.hub";
         } else {
-            return "networkutilities.command." + commandName;
+            return "nwutils.command." + commandName;
         }
     }
 
@@ -361,7 +468,6 @@ public class HubCmd extends Command {
             return null;
         } else {
             return commandAliases.toArray(new String[0]);
-
         }
     }
 }
