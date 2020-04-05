@@ -18,7 +18,7 @@ public class HubCmd extends Command {
 
     // config entries
     private static Configuration options = Config.getOptions().getSection("commands").getSection("hub");
-    private static Configuration messages = Config.getMessages().getSection("commands").getSection("hub");
+    private Configuration messages = Config.getMessages().getSection("commands").getSection("hub");
 
     private static String permission = getCommandPermission();
     private String targetServer = options.getString("targetServer");
