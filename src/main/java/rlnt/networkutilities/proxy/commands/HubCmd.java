@@ -7,10 +7,7 @@ import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.config.Configuration;
 import rlnt.networkutilities.proxy.utils.*;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -23,6 +20,7 @@ public class HubCmd extends Command {
     private static String permission = getCommandPermission();
     private String targetServer = options.getString("targetServer");
     private ServerInfo target = Server.getServerByName(targetServer);
+    private Set<String> networkServers = Server.getServerNames();
 
     public HubCmd() {
         super(getCommandName(), permission, getCommandAlias());
@@ -182,7 +180,7 @@ public class HubCmd extends Command {
                     }
                 }
             });
-        } else if (Server.getServerNames().contains(subcommand)) {
+        } else if (networkServers.contains(subcommand)) {
             // a server's name was entered, send server players to hub
             if (isPlayer) {
                 // check permission
