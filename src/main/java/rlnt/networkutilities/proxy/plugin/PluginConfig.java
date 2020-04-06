@@ -98,4 +98,8 @@ public class PluginConfig {
             throw new PluginConfigException("Config is outdated or invalid");
         }
     }
+
+	public String getFallbackServer() {
+        return config.getString("commands.hub.targetServer");
+	}
 }
