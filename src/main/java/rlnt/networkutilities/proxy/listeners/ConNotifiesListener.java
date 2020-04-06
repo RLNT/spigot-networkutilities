@@ -109,7 +109,7 @@ public class ConNotifiesListener implements Listener {
         // placeholder logic
         Map<String, String> placeholders = new HashMap<>();
         placeholders.put("{player}", player.getName());
-        placeholders.put("%server%", server.getName());
+        placeholders.put("{server}", server.getName());
 
         // send disconnect broadcast to the network
         Communication.networkCfgMsg(messages, "networkQuit", placeholders);
