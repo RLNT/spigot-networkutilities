@@ -9,19 +9,19 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
-import rlnt.networkutilities.proxy.NetworkUtilities;
 import rlnt.networkutilities.proxy.utils.Communication;
 import rlnt.networkutilities.proxy.utils.Config;
 import rlnt.networkutilities.proxy.utils.Location;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 public class ConNotifiesListener implements Listener {
 
-    private Configuration messages = NetworkUtilities.getInstance().getMessages().getSection("connectionNotifications");
-    private Configuration networkJoin = messages.getSection("networkJoin");
-    private Configuration serverSwitch = messages.getSection("serverSwitch");
-    private Configuration networkQuit = messages.getSection("networkQuit");
+    // config entries
+    private Configuration messages = Config.getMessages().getSection("connectionNotifications");
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void serverConnect(ServerSwitchEvent event) {
@@ -31,93 +31,66 @@ public class ConNotifiesListener implements Listener {
         playerList.remove(player);
 
         // save last server the player was on and update the map
+        // if the key had a value already, it's stored to oldServer
         ServerInfo oldServer = Location.updatePlayerLocation(player);
 
         if (oldServer == null) {
             // player connected to the network
 
+            // messages
+            Configuration networkJoin = messages.getSection("networkJoin");
+
+            // placeholder logic
+            Map<String, String> placeholders = new HashMap<>();
+            placeholders.put("{player}", player.getName());
+            placeholders.put("{server}", player.getServer().getInfo().getName());
+
             // network join notification for the player
-            if (Config.messageEnabled(networkJoin, "player")) {
-                if (Config.messageEmpty(networkJoin, "player")) {
-                    Communication.sendPlayerMessage(player, Config.getMessage(networkJoin, "player")
-                            .replace("%player%", player.getName())
-                            .replace("%server%", player.getServer().getInfo().getName())
-                    );
-                } else if (Config.messageEnabled(networkJoin, "network") && Config.messageEmpty(networkJoin, "network")) {
-                    Communication.sendPlayerMessage(player, Config.getMessage(networkJoin, "network")
-                            .replace("%player%", player.getName())
-                            .replace("%server%", player.getServer().getInfo().getName())
-                    );
-                }
+            if (!Config.messageEmpty(networkJoin, "player")) {
+                Communication.playerCfgMsg(player, networkJoin, "player", placeholders);
+            } else {
+                Communication.playerCfgMsg(player, networkJoin, "network", placeholders);
             }
 
             // network join notification for the network
-            if (Config.messageEnabled(networkJoin, "network") && Config.messageEmpty(networkJoin, "network")) {
-                Communication.sendGroupMessage(playerList, Config.getMessage(networkJoin, "network")
-                        .replace("%player%", player.getName())
-                        .replace("%server%", player.getServer().getInfo().getName())
-                );
-            }
+            Communication.groupCfgMsg(playerList, networkJoin, "network", placeholders);
         } else {
             // player switched the server
             ServerInfo newServer = player.getServer().getInfo();
 
+            // messages
+            Configuration serverSwitch = messages.getSection("serverSwitch");
+
+            // placeholder logic
+            Map<String, String> placeholders = new HashMap<>();
+            placeholders.put("{player}", player.getName());
+            placeholders.put("{old}", oldServer.getName());
+            placeholders.put("{new}", newServer.getName());
+
             // server switch notification for the player
-            if (Config.messageEnabled(serverSwitch, "player")) {
-                if (Config.messageEmpty(serverSwitch, "player")) {
-                    Communication.sendPlayerMessage(player, Config.getMessage(serverSwitch, "player")
-                            .replace("%player%", player.getName())
-                            .replace("%old%", oldServer.getName())
-                            .replace("%new%", newServer.getName())
-                    );
-                } else if (Config.messageEnabled(serverSwitch, "network") && Config.messageEmpty(serverSwitch, "network")) {
-                    Communication.sendPlayerMessage(player, Config.getMessage(serverSwitch, "network")
-                            .replace("%player%", player.getName())
-                            .replace("%old%", oldServer.getName())
-                            .replace("%new%", newServer.getName())
-                    );
-                }
+            if (!Config.messageEmpty(serverSwitch, "player")) {
+                Communication.playerCfgMsg(player, serverSwitch, "player", placeholders);
+            } else {
+                Communication.playerCfgMsg(player, serverSwitch, "network", placeholders);
             }
 
             // server switch notification for the network
-            if (Config.messageEnabled(serverSwitch, "network")) {
-                // server switch notification for the old server
-                if (Config.messageEmpty(serverSwitch, "oldServer")) {
-                    Collection<ProxiedPlayer> oldServerPlayers = new HashSet<>(oldServer.getPlayers());
-                    oldServerPlayers.remove(player);
+            // old server
+            Collection<ProxiedPlayer> oldServerPlayers = new HashSet<>(oldServer.getPlayers());
+            oldServerPlayers.remove(player);
+            Communication.groupCfgMsg(oldServerPlayers, serverSwitch, "oldServer", placeholders);
 
-                    Communication.sendGroupMessage(oldServerPlayers, Config.getMessage(serverSwitch, "oldServer")
-                            .replace("%player%", player.getName())
-                            .replace("%old%", oldServer.getName())
-                            .replace("%new%", newServer.getName())
-                    );
+            playerList.removeAll(oldServer.getPlayers());
 
-                    playerList.removeAll(oldServer.getPlayers());
-                }
+            // new server
+            Collection<ProxiedPlayer> newServerPlayers = new HashSet<>(newServer.getPlayers());
+            newServerPlayers.remove(player);
+            Communication.groupCfgMsg(newServerPlayers, serverSwitch, "newServer", placeholders);
 
-                // server switch notification for the new server
-                if (Config.messageEmpty(serverSwitch, "newServer")) {
-                    Collection<ProxiedPlayer> newServerPlayers = new HashSet<>(newServer.getPlayers());
-                    newServerPlayers.remove(player);
+            playerList.removeAll(newServer.getPlayers());
 
-                    Communication.sendGroupMessage(newServerPlayers, Config.getMessage(serverSwitch, "newServer")
-                            .replace("%player%", player.getName())
-                            .replace("%old%", oldServer.getName())
-                            .replace("%new%", newServer.getName())
-                    );
-
-                    playerList.removeAll(newServer.getPlayers());
-                }
-
-                // server switch notification for the rest of the network
-                if (Config.messageEmpty(serverSwitch, "network")) {
-                    Communication.sendGroupMessage(playerList, Config.getMessage(serverSwitch, "network")
-                            .replace("%player%", player.getName())
-                            .replace("%old%", oldServer.getName())
-                            .replace("%new%", newServer.getName())
-                    );
-                }
-            }
+            // rest of the network
+            Communication.groupCfgMsg(playerList, serverSwitch, "network", placeholders);
         }
     }
 
@@ -133,12 +106,12 @@ public class ConNotifiesListener implements Listener {
         // remove player from map since they disconnected
         Location.removePlayerLocation(player);
 
+        // placeholder logic
+        Map<String, String> placeholders = new HashMap<>();
+        placeholders.put("{player}", player.getName());
+        placeholders.put("%server%", server.getName());
+
         // send disconnect broadcast to the network
-        if (networkQuit.getBoolean("enabled", false) && !networkQuit.getString("message").isEmpty()) {
-            Communication.sendNetworkMessage(networkQuit.getString("message")
-                    .replace("%player%", player.getName())
-                    .replace("%server%", server.getName())
-            );
-        }
+        Communication.networkCfgMsg(messages, "networkQuit", placeholders);
     }
 }
