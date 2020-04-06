@@ -14,46 +14,47 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-public class ServerKickListener implements Listener {
+public class ReconnectListener implements Listener {
+
+    // TODO: send player a message that he was reconnected
+    // TODO: send player a kick message that he could not be reconnected
+
+    private Logger logger = NetworkUtilities.getInstance().getLogger();
 
     // config entries
     private Configuration options = Config.getOptions();
-    private Configuration messages = Config.getMessages();
 
-    private Logger logger = NetworkUtilities.getInstance().getLogger();
     private ServerInfo fallbackServer = Server.getServerByName(options.getString("hubServer"));
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onServerKickEvent(ServerKickEvent event) {
         CountDownLatch doneSignal = new CountDownLatch(1);
 
-        event.getKickedFrom().ping((serverPing, e) -> {
-            // ping returned something, so we do not care
-            if (serverPing != null)  {
+        ServerInfo server = event.getKickedFrom();
+        ServerInfo cancelServer = event.getCancelServer();
+
+        // check if cancel server is the fallback server
+        if (cancelServer == fallbackServer) return;
+
+        // check if the server the player was kicked from is still online
+        server.ping((result, error) -> {
+            if (error == null) {
+                // server is online
                 doneSignal.countDown();
                 return;
             }
 
-            // this _should_ be impossible
-            if (e != null) {
-                logger.severe("Ping returned (null, null). This is impossible so wtf did you do?.");
-                doneSignal.countDown();
-                return;
-            }
-
-            // if there is already a cancel server (for whatever reason), check if it's not the server the player came from.
-            ServerInfo cancelServer = event.getCancelServer();
-            if (cancelServer == null) { // no cancel server set
+            // set the cancel server from the config
+            if (cancelServer == null) {
                 event.setCancelServer(fallbackServer);
-            } else { // cancel server is set, check if its not the original server
-                if (cancelServer == event.getKickedFrom()) {
-                    // this should not be possible
-                    logger.warning("A player was set to connect to the same server he just came from, that is also unreachable");
+            } else {
+                if (cancelServer == server) {
+                    // cancel server is the same that the player was kicked from
                     event.setCancelServer(fallbackServer);
                 }
             }
 
-            // cancel event so the player get send to the cancel server
+            // cancel event so the player is sent to the cancel server
             event.setCancelled(true);
 
             // count down latch
@@ -64,10 +65,10 @@ public class ServerKickListener implements Listener {
         try {
             if (!doneSignal.await(1, TimeUnit.MINUTES)) {
                 // latch timed out
-                logger.warning("Timed out waiting for latch when handling a kick event");
+                logger.warning("&c  > &eTask timed out while waiting for countdown latch handling a kick event for player &c" + event.getPlayer().getName() + "&e!");
             }
         } catch (InterruptedException e) {
-            logger.warning("Thread got interupted while waiting for count down latch when handling a kick event");
+            logger.warning("&c  > &eThread was interrupted while waiting for the countdown latch handling a kick event for player &c" + event.getPlayer().getName() + "&e!");
             e.printStackTrace();
         }
     }
