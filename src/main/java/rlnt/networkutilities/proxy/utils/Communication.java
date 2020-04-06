@@ -65,15 +65,13 @@ public enum Communication {
         if (!Config.messageEnabled(section, type)) return;
         if (Config.messageEmpty(section, type)) return;
 
-        if (placeholders == null || placeholders.isEmpty()) {
-            playerMsg(player, Config.getMessage(section, type));
-        } else {
-            String message = Config.getMessage(section, type);
+        String message = Config.getMessage(section, type);
+        if (placeholders != null && !placeholders.isEmpty()) {
             for (String placeholder : placeholders.keySet()) {
                 message = message.replace(placeholder, placeholders.get(placeholder));
             }
-            playerMsg(player, message);
         }
+        playerMsg(player, message);
     }
 
     /**
@@ -114,15 +112,13 @@ public enum Communication {
         if (!Config.messageEnabled(section, type)) return;
         if (Config.messageEmpty(section, type)) return;
 
-        if (placeholders == null || placeholders.isEmpty()) {
-            senderMsg(sender, Config.getMessage(section, type));
-        } else {
-            String message = Config.getMessage(section, type);
+        String message = Config.getMessage(section, type);
+        if (placeholders != null && !placeholders.isEmpty()) {
             for (String placeholder : placeholders.keySet()) {
                 message = message.replace(placeholder, placeholders.get(placeholder));
             }
-            senderMsg(sender, message);
         }
+        senderMsg(sender, message);
     }
 
     /**
