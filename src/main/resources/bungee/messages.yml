@@ -33,10 +33,10 @@ firstJoinNotifications:
   #    string ("") will send the player the same message that the
   #    network receives if the network message is enabled
   # Available placeholders:
-  #  > %player% - the name of the player that connected for the first time
+  #  > {player} - the name of the player that connected for the first time
   player:
     enabled: true
-    message: "&6Welcome to our Network, &e%player%&6! &aI see you are new here."
+    message: "&6Welcome to our Network, &e{player}&6! &aI see you are new here."
 
   # This message is shown to the network when a player joins for
   # the first time.
@@ -44,10 +44,10 @@ firstJoinNotifications:
   #  > setting 'enabled' to true but setting the message to an empty
   #    string ("") will also disable the message completely
   # Available placeholders:
-  #  > %player% - the name of the player that connected for the first time
+  #  > {player} - the name of the player that connected for the first time
   network:
     enabled: true
-    message: "&e%player% &aconnected for the first time!"
+    message: "&e{player} &aconnected for the first time!"
 
 
 # CONNECTION NOTIFICATIONS MODULE MESSAGES #
