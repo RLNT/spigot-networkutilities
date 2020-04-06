@@ -1,4 +1,19 @@
 ###################################################################
+###                             MAIN                            ###
+###################################################################
+# In this section you can adjust the main options of the plugin.  #
+###################################################################
+
+# HUB SERVER OPTION #
+# This option defines whether which server is the hub server.
+# The hub server option is important for the firstJoinBroadcast
+# system. Also the server that is given here will be used as the
+# fallback server. Players are reconnected to it if the server
+# they are currently on goes down or crashes.
+# MULTIPLE HUBS/LOBBIES ARE NOT SUPPORTED!
+hubServer: "Lobby"
+
+###################################################################
 ###                           MODULES                           ###
 ###################################################################
 # In this section you can toggle each module.                     #
