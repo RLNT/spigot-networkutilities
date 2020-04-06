@@ -65,15 +65,13 @@ public enum Communication {
         if (!Config.messageEnabled(section, type)) return;
         if (Config.messageEmpty(section, type)) return;
 
-        if (placeholders == null || placeholders.isEmpty()) {
-            playerMsg(player, Config.getMessage(section, type));
-        } else {
-            String message = Config.getMessage(section, type);
+        String message = Config.getMessage(section, type);
+        if (placeholders != null && !placeholders.isEmpty()) {
             for (String placeholder : placeholders.keySet()) {
                 message = message.replace(placeholder, placeholders.get(placeholder));
             }
-            playerMsg(player, message);
         }
+        playerMsg(player, message);
     }
 
     /**
@@ -114,15 +112,13 @@ public enum Communication {
         if (!Config.messageEnabled(section, type)) return;
         if (Config.messageEmpty(section, type)) return;
 
-        if (placeholders == null || placeholders.isEmpty()) {
-            senderMsg(sender, Config.getMessage(section, type));
-        } else {
-            String message = Config.getMessage(section, type);
+        String message = Config.getMessage(section, type);
+        if (placeholders != null && !placeholders.isEmpty()) {
             for (String placeholder : placeholders.keySet()) {
                 message = message.replace(placeholder, placeholders.get(placeholder));
             }
-            senderMsg(sender, message);
         }
+        senderMsg(sender, message);
     }
 
     /**
@@ -142,6 +138,43 @@ public enum Communication {
     }
 
     /**
+     * Will send a colorized message from the config
+     * to a given group of players if the group and
+     * the message are not empty.
+     *
+     * @param group the group of player to send the message to
+     * @param section the configuration section
+     * @param type the type of the message
+     */
+    public static void groupCfgMsg(Collection<ProxiedPlayer> group, Configuration section, String type) {
+        groupCfgMsg(group, section, type, null);
+    }
+
+    /**
+     * Will send a colorized message from the config
+     * to a given group of players if the group and
+     * the message are not empty.
+     *
+     * @param group the group of player to send the message to
+     * @param section the configuration section
+     * @param type the type of the message
+     * @param placeholders the placeholders to replace in the message
+     */
+    public static void groupCfgMsg(Collection<ProxiedPlayer> group, Configuration section, String type, Map<String, String> placeholders) {
+        if (group.isEmpty()) return;
+        if (!Config.messageEnabled(section, type)) return;
+        if (Config.messageEmpty(section, type)) return;
+
+        String message = Config.getMessage(section, type);
+        if (placeholders != null && !placeholders.isEmpty()) {
+            for (String placeholder : placeholders.keySet()) {
+                message = message.replace(placeholder, placeholders.get(placeholder));
+            }
+        }
+        groupMsg(group, message);
+    }
+
+    /**
      * Will send a colorized message to the whole
      * network if the message is not empty.
      *
@@ -154,5 +187,26 @@ public enum Communication {
         for (ProxiedPlayer player : network) {
             player.sendMessage(new TextComponent(General.colorize(message)));
         }
+    }
+
+    /**
+     * Will send a colorized message from the config
+     * to the whole network if the message is not empty.
+     *
+     * @param section the configuration section
+     * @param type the type of the message
+     * @param placeholders the placeholders to replace in the message
+     */
+    public static void networkCfgMsg(Configuration section, String type, Map<String, String> placeholders) {
+        if (!Config.messageEnabled(section, type)) return;
+        if (Config.messageEmpty(section, type)) return;
+
+        String message = Config.getMessage(section, type);
+        if (placeholders != null && !placeholders.isEmpty()) {
+            for (String placeholder : placeholders.keySet()) {
+                message = message.replace(placeholder, placeholders.get(placeholder));
+            }
+        }
+        networkMsg(message);
     }
 }

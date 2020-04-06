@@ -60,22 +60,22 @@ connectionNotifications:
     #    string ("") will send the player the same message that the
     #    network receives if the network message is enabled
     # Available placeholders:
-    #  > %player% - the name of the player that connected
-    #  > %server% - the name of the server the player joined on connect
+    #  > {player} - the name of the player that connected
+    #  > {server} - the name of the server the player joined on connect
     player:
       enabled: true
-      message: "&6Welcome to our Network, &e%player%&6! &aYou are now on the server &e%server%&a."
+      message: "&6Welcome to our Network, &e{player}&6! &aYou are now on the server &e{server}&a."
 
     # This message is shown to the network when a player connects.
     #  > setting 'enabled' to false will completely disable the message
     #  > setting 'enabled' to true but setting the message to an empty
     #    string ("") will also disable the message completely
     # Available placeholders:
-    #  > %player% - the name of the player that connected
-    #  > %server% - the name of the server the player joined on connect
+    #  > {player} - the name of the player that connected
+    #  > {server} - the name of the server the player joined on connect
     network:
       enabled: true
-      message: "&e%player% &ahas entered the network and is now on the server &e%server%&a!"
+      message: "&e{player} &ahas entered the network and is now on the server &e{server}&a!"
 
   # all messages that are sent when someone switches servers
   serverSwitch:
@@ -85,12 +85,12 @@ connectionNotifications:
     #    string ("") will send the player the same message that the
     #    network receives if the network message is enabled
     # Available placeholders:
-    #  > %player% - the name of the player that switched servers
-    #  > %old% - the name of the server the player switched from
-    #  > %new% - the name of the server the player switched to
+    #  > {player} - the name of the player that switched servers
+    #  > {old} - the name of the server the player switched from
+    #  > {new} - the name of the server the player switched to
     player:
       enabled: true
-      message: "&fYou (&7%player%&f) switched from server &a%old% &fto server &a%new%&f!"
+      message: "&fYou (&7{player}&f) switched from server &a{old} &fto server &a{new}&f!"
 
     # This message is shown to the network when a player switched servers.
     # You can define a switch message for the old server the player came
@@ -100,14 +100,14 @@ connectionNotifications:
     #  > setting 'enabled' to true but setting the message to an empty
     #    string ("") will also disable the message completely
     # Available placeholders:
-    #  > %player% - the name of the player that switched servers
-    #  > %old% - the name of the server the player switched from
-    #  > %new% - the name of the server the player switched to
+    #  > {player} - the name of the player that switched servers
+    #  > {old} - the name of the server the player switched from
+    #  > {new} - the name of the server the player switched to
     network:
       enabled: true
-      network: "&e%player% &fswitched from server &a%old% &fto server &a%new%&f!"
-      oldServer: "&e%player% &fswitched from your server (&7%old%&f) to server &a%new%&f!"
-      newServer: "&e%player% &fswitched from server &a%old% &fto your server (&7%new%&f)!"
+      network: "&e{player} &fswitched from server &a{old} &fto server &a{new}&f!"
+      oldServer: "&e{player} &fswitched from your server (&7{old}&f) to server &a{new}&f!"
+      newServer: "&e{player} &fswitched from server &a{old} &fto your server (&7{new}&f)!"
 
   # all messages that are sent when someone leaves the network
   networkQuit:
@@ -116,10 +116,10 @@ connectionNotifications:
     #  > setting 'enabled' to true but setting the message to an empty
     #    string ("") will also disable the message completely
     # Available placeholders:
-    #  > %player% - the name of the player that disconnected
-    #  > %server% - the name of the server the player was last on
+    #  > {player} - the name of the player that disconnected
+    #  > {server} - the name of the server the player was last on
     enabled: true
-    message: "&e%player% &chas left the network (&7last server &a%server%&c)!"
+    message: "&e{player} &chas left the network (&7last server &a{server}&c)!"
 
 
 # WAIT FOR SERVER MODULE MESSAGES #
