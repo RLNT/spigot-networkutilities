@@ -74,11 +74,9 @@ public final class NetworkUtilities extends JavaPlugin {
     private void listeners() {
         getServer().getPluginManager().registerEvents(new ServerNotifications(), this);
 
-        if (config.getBoolean("isHubServer", false)) {
-            getServer().getPluginManager().registerEvents(new FirstJoin(), this);
-            getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-            getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new PluginChannel());
-        }
+        getServer().getPluginManager().registerEvents(new FirstJoin(), this);
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
+        getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", new PluginChannel());
     }
 
     public static NetworkUtilities getInstance() {

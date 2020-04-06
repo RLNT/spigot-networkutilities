@@ -1,20 +1,4 @@
 ###################################################################
-###                             MAIN                            ###
-###################################################################
-# In this section you can adjust the main options of the plugin.  #
-###################################################################
-
-# HUB SERVER OPTION #
-# This option defines whether this server is the hub/lobby server.
-# The hub server option is important for the firstJoinBroadcast
-# system. It's important to restart after adjusting this setting.
-# After the restart, a messages.yml file will be available only
-# for the hub/lobby server.
-# MULTIPLE HUBS/LOBBIES ARE NOT SUPPORTED!
-isHubServer: false
-
-
-###################################################################
 ###                           MODULES                           ###
 ###################################################################
 # In this section you can toggle each module.                     #
