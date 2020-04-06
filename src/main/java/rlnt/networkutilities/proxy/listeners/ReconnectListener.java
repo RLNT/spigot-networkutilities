@@ -36,6 +36,9 @@ public class ReconnectListener implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onServerKickEvent(ServerKickEvent event) {
+        // if there is a kick reason, the kick cannot be because of a crash -> ignore the event
+        if (event.getKickReasonComponent().length > 0) return;
+
         CountDownLatch doneSignal = new CountDownLatch(1);
 
         ServerInfo server = event.getKickedFrom();
@@ -99,7 +102,7 @@ public class ReconnectListener implements Listener {
         try {
             if (!doneSignal.await(1, TimeUnit.MINUTES)) {
                 // latch timed out, assume the server is down
-                logger.warning("&c  > &eTask timed out while checking if fallback server is online (fallback server name: &c" +fallbackServer.getName() + "&e)");
+                logger.warning("&c  > &eTask timed out while checking if fallback server is online (fallback server name: &c" + fallbackServer.getName() + "&e)");
                 return false;
             }
         } catch (InterruptedException e) {
