@@ -45,7 +45,7 @@ public class PluginChannelListener implements Listener {
         if (type.equals("firstJoin")) {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(in.readUTF());
 
-            if (!hubServer.getName().equals(player.getServer().getInfo().getName())) return;
+            if (hubServer != player.getServer().getInfo()) return;
 
             Collection<ProxiedPlayer> playerList = new HashSet<>(ProxyServer.getInstance().getPlayers());
             playerList.remove(player);
