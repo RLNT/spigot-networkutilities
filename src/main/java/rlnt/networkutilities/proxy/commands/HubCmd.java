@@ -3,6 +3,7 @@ package rlnt.networkutilities.proxy.commands;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.config.Configuration;
 import rlnt.networkutilities.proxy.utils.*;
@@ -170,7 +171,7 @@ public class HubCmd extends Command {
                             // send message to targeted player
                             Communication.playerCfgMsg(targetPlayer, toTarget, "failed", targetPlaceholders);
                         }
-                    });
+                    }, ServerConnectEvent.Reason.COMMAND);
                 } else {
                     // hub is not online
                     if (isPlayer) {
