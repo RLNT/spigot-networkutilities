@@ -73,6 +73,12 @@ public class NetworkUtilities extends Plugin {
     @Override
     public void onDisable() {
         getProxy().unregisterChannel("networkutilities");
+        
+        try {
+            Whitelist.save();
+        } catch (PluginConfigException e) {
+            e.printStackTrace();
+        }
     }
 
     private void configs() throws PluginConfigException {
@@ -81,7 +87,7 @@ public class NetworkUtilities extends Plugin {
         messages = new PluginConfig("messages.yml", messagesVersion, messagesKeys);
         if (config.getBoolean("uuidBasedWhitelist", false)) {
             whitelist = new PluginConfig("whitelist.yml");
-            Whitelist.setWhitelist(whitelist.getConfig().getStringList("whitelist"));
+            Whitelist.load(whitelist);
         }
     }
 

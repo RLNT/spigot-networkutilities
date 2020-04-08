@@ -74,7 +74,7 @@ public class PluginConfig {
         // load the config
         try {
             config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
-        } catch(IOException e) {
+        } catch (IOException e) {
             logger.severe("&c  > &e" + name + " &4couldn't be loaded! &5Disabling the plugin...");
             throw new PluginConfigException("Loading config" + name, e);
         }
@@ -96,6 +96,15 @@ public class PluginConfig {
             logger.severe("&c  > &eYour &c" + name + " &eseems to be outdated!");
             logger.info("&6  > &fMake sure your file is up to date.");
             throw new PluginConfigException("Config is outdated or invalid");
+        }
+    }
+
+    public void save() throws PluginConfigException {
+        try {
+            ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, file);
+        } catch (IOException e) {
+            logger.severe("&c  > &e" + name + " &4couldn't be saved!");
+            throw new PluginConfigException("Saveing config" + name, e);
         }
     }
 }
