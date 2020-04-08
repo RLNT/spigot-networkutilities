@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 // TODO: permission required option kann weg, aus config entfernen und aus allen commands
 // TODO: whitelist save when plugin disabling
@@ -25,6 +27,21 @@ public class WhitelistCmd extends Command {
 
     public WhitelistCmd() {
         super("whitelist", "networkutilities.command.whitelist", getCommandAlias());
+    }
+
+    /**
+     * Will return the command alias which has the same execution
+     * functionality like the command name.
+     *
+     * @return the command alias
+     */
+    private static String[] getCommandAlias() {
+        if (options.getStringList("commandAlias").isEmpty()) {
+            return null;
+        } else {
+            List<String> aliasesList = options.getStringList("commandAliases");
+            return aliasesList.toArray(new String[0]);
+        }
     }
 
     @Override
@@ -40,6 +57,14 @@ public class WhitelistCmd extends Command {
             isPlayer = false;
             player = null;
         }
+
+        BiConsumer<Configuration, String> message = (section, token) -> {
+            if (isPlayer) {
+                Communication.playerCfgMsg(player, section, token);
+            } else {
+                Communication.senderCfgMsg(sender, section, token);
+            }
+        };
 
         // define the sub command
         String subcommand;
@@ -73,23 +98,16 @@ public class WhitelistCmd extends Command {
                 }
 
                 Configuration check = messages.getSection("check");
+                Consumer<String> msg = token -> message.accept(check, token);
 
                 // check command length - check needs 1 argument
                 if (args.length < 2) {
                     // argument is missing
-                    if (isPlayer) {
-                        Communication.playerCfgMsg(player, check, "missing");
-                    } else {
-                        Communication.senderCfgMsg(sender, check, "missing");
-                    }
+                    msg.accept("missing");
                     break;
                 } else if (args.length > 2) {
                     // too many arguments
-                    if (isPlayer) {
-                        Communication.playerCfgMsg(player, check, "toomany");
-                    } else {
-                        Communication.senderCfgMsg(sender, check, "toomany");
-                    }
+                    msg.accept("toomany");
                     break;
                 }
 
@@ -103,11 +121,7 @@ public class WhitelistCmd extends Command {
                     try {
                         Minecraft.getUsername(uuid);
                     } catch (ApiException e) {
-                        if (isPlayer) {
-                            Communication.playerCfgMsg(player, check, "invalid");
-                        } else {
-                            Communication.senderCfgMsg(sender, check, "invalid");
-                        }
+                        msg.accept("invalidUuid");
                         break;
                     }
                 } else {
@@ -115,11 +129,7 @@ public class WhitelistCmd extends Command {
                     try {
                         uuid = Minecraft.getUuid(input);
                     } catch (ApiException e) {
-                        if (isPlayer) {
-                            Communication.playerCfgMsg(player, check, "invalid");
-                        } else {
-                            Communication.senderCfgMsg(sender, check, "invalid");
-                        }
+                        msg.accept("invalidName");
                         break;
                     }
                 }
@@ -131,6 +141,7 @@ public class WhitelistCmd extends Command {
                 // check if whitelisted
                 if (Whitelist.isWhitelisted(uuid)) {
                     // requested player is whitelisted
+                    msg.accept("whitelisted");
                     if (isPlayer) {
                         Communication.playerCfgMsg(player, check, "whitelisted", placeholders);
                     } else {
@@ -155,15 +166,12 @@ public class WhitelistCmd extends Command {
                 }
 
                 Configuration list = messages.getSection("list");
+                Consumer<String> msg = token -> message.accept(list, token);
 
-                // check command length - check needs no argument
-                if (args.length > 2){
+                // check command length - list needs no argument
+                if (args.length > 2) {
                     // to many arguments
-                    if (isPlayer) {
-                        Communication.playerCfgMsg(player, list, "toomany");
-                    } else {
-                        Communication.senderCfgMsg(sender, list, "toomany");
-                    }
+                    msg.accept("toomany");
                     break;
                 }
 
@@ -187,23 +195,16 @@ public class WhitelistCmd extends Command {
                 }
 
                 Configuration add = messages.getSection("add");
+                Consumer<String> msg = token -> message.accept(add, token);
 
                 // check command length - add needs 1 argument
                 if (args.length < 2) {
                     // argument is missing
-                    if (isPlayer) {
-                        Communication.playerCfgMsg(player, add, "missing");
-                    } else {
-                        Communication.senderCfgMsg(sender, add, "missing");
-                    }
+                    msg.accept("missing");
                     break;
-                } else if (args.length > 2){
+                } else if (args.length > 2) {
                     // too many arguments
-                    if (isPlayer) {
-                        Communication.playerCfgMsg(player, add, "toomany");
-                    } else {
-                        Communication.senderCfgMsg(sender, add, "toomany");
-                    }
+                    msg.accept("missing");
                     break;
                 }
 
@@ -217,11 +218,7 @@ public class WhitelistCmd extends Command {
                     try {
                         Minecraft.getUsername(uuid);
                     } catch (ApiException e) {
-                        if (isPlayer) {
-                            Communication.playerCfgMsg(player, add, "invalidUuid");
-                        } else {
-                            Communication.senderCfgMsg(sender, add, "invalidUuid");
-                        }
+                        msg.accept("invalidUuid");
                         break;
                     }
                 } else {
@@ -229,11 +226,7 @@ public class WhitelistCmd extends Command {
                     try {
                         uuid = Minecraft.getUuid(input);
                     } catch (ApiException e) {
-                        if (isPlayer) {
-                            Communication.playerCfgMsg(player, add, "invalidName");
-                        } else {
-                            Communication.senderCfgMsg(sender, add, "invalidName");
-                        }
+                        msg.accept("invalidName");
                         break;
                     }
                 }
@@ -284,23 +277,16 @@ public class WhitelistCmd extends Command {
                 }
 
                 Configuration remove = messages.getSection("remove");
+                Consumer<String> msg = token -> message.accept(remove, token);
 
                 // check command length - remove needs 1 argument
                 if (args.length < 2) {
                     // argument is missing
-                    if (isPlayer) {
-                        Communication.playerCfgMsg(player, remove, "missing");
-                    } else {
-                        Communication.senderCfgMsg(sender, remove, "missing");
-                    }
+                    msg.accept("missing");
                     break;
-                } else if (args.length > 2){
+                } else if (args.length > 2) {
                     // too many arguments
-                    if (isPlayer) {
-                        Communication.playerCfgMsg(player, remove, "toomany");
-                    } else {
-                        Communication.senderCfgMsg(sender, remove, "toomany");
-                    }
+                    msg.accept("toomany");
                     break;
                 }
 
@@ -314,11 +300,7 @@ public class WhitelistCmd extends Command {
                     try {
                         Minecraft.getUsername(uuid);
                     } catch (ApiException e) {
-                        if (isPlayer) {
-                            Communication.playerCfgMsg(player, remove, "invalidUuid");
-                        } else {
-                            Communication.senderCfgMsg(sender, remove, "invalidUuid");
-                        }
+                        msg.accept("invalidUuid");
                         break;
                     }
                 } else {
@@ -326,11 +308,7 @@ public class WhitelistCmd extends Command {
                     try {
                         uuid = Minecraft.getUuid(input);
                     } catch (ApiException e) {
-                        if (isPlayer) {
-                            Communication.playerCfgMsg(player, remove, "invalidName");
-                        } else {
-                            Communication.senderCfgMsg(sender, remove, "invalidName");
-                        }
+                        msg.accept("invalidName");
                         break;
                     }
                 }
@@ -373,21 +351,6 @@ public class WhitelistCmd extends Command {
 
                 break;
             }
-        }
-    }
-
-    /**
-     * Will return the command alias which has the same execution
-     * functionality like the command name.
-     *
-     * @return the command alias
-     */
-    private static String[] getCommandAlias() {
-        if (options.getStringList("commandAlias").isEmpty()) {
-            return null;
-        } else {
-            List<String> aliasesList = options.getStringList("commandAliases");
-            return aliasesList.toArray(new String[0]);
         }
     }
 }
