@@ -17,7 +17,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 // TODO: permission required option kann weg, aus config entfernen und aus allen commands
-// TODO: whitelist save when plugin disabling
 
 public class WhitelistCmd extends Command {
 

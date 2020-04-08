@@ -73,6 +73,12 @@ public class NetworkUtilities extends Plugin {
     @Override
     public void onDisable() {
         getProxy().unregisterChannel("networkutilities");
+        
+        try {
+            Whitelist.save();
+        } catch (PluginConfigException e) {
+            e.printStackTrace();
+        }
     }
 
     private void configs() throws PluginConfigException {
