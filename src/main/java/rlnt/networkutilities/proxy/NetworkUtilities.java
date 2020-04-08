@@ -81,7 +81,7 @@ public class NetworkUtilities extends Plugin {
         messages = new PluginConfig("messages.yml", messagesVersion, messagesKeys);
         if (config.getBoolean("uuidBasedWhitelist", false)) {
             whitelist = new PluginConfig("whitelist.yml");
-            Whitelist.setWhitelist(whitelist.getConfig().getStringList("whitelist"));
+            Whitelist.load(whitelist);
         }
     }
 

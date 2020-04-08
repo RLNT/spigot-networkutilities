@@ -6,6 +6,7 @@ import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.config.Configuration;
 import rlnt.networkutilities.proxy.api.ApiException;
 import rlnt.networkutilities.proxy.api.Minecraft;
+import rlnt.networkutilities.proxy.plugin.PluginConfigException;
 import rlnt.networkutilities.proxy.utils.*;
 
 import java.util.HashMap;
@@ -14,7 +15,6 @@ import java.util.Map;
 import java.util.UUID;
 
 // TODO: permission required option kann weg, aus config entfernen und aus allen commands
-// TODO: whitelist save when adding or removing entries
 // TODO: whitelist save when plugin disabling
 
 public class WhitelistCmd extends Command {
@@ -84,7 +84,7 @@ public class WhitelistCmd extends Command {
                     }
                     break;
                 } else if (args.length > 2) {
-                    // to many arguments
+                    // too many arguments
                     if (isPlayer) {
                         Communication.playerCfgMsg(player, check, "toomany");
                     } else {
@@ -198,7 +198,7 @@ public class WhitelistCmd extends Command {
                     }
                     break;
                 } else if (args.length > 2){
-                    // to many arguments
+                    // too many arguments
                     if (isPlayer) {
                         Communication.playerCfgMsg(player, add, "toomany");
                     } else {
@@ -254,20 +254,24 @@ public class WhitelistCmd extends Command {
                 }
 
                 // add to whitelist
-                if (Whitelist.addWhitelist(uuid)) {
-                    // added successfully
-                    if (isPlayer) {
-                        Communication.playerCfgMsg(player, add, "success", placeholders);
+                try {
+                    if (Whitelist.add(uuid)) {
+                        // added successfully
+                        if (isPlayer) {
+                            Communication.playerCfgMsg(player, add, "success", placeholders);
+                        } else {
+                            Communication.senderCfgMsg(sender, add, "success", placeholders);
+                        }
                     } else {
-                        Communication.senderCfgMsg(sender, add, "success", placeholders);
+                        // failed to add
+                        if (isPlayer) {
+                            Communication.playerCfgMsg(player, add, "failed", placeholders);
+                        } else {
+                            Communication.senderCfgMsg(sender, add, "failed", placeholders);
+                        }
                     }
-                } else {
-                    // failed to add
-                    if (isPlayer) {
-                        Communication.playerCfgMsg(player, add, "failed", placeholders);
-                    } else {
-                        Communication.senderCfgMsg(sender, add, "failed", placeholders);
-                    }
+                } catch (PluginConfigException e) {
+                    e.printStackTrace();
                 }
 
                 break;
@@ -291,7 +295,7 @@ public class WhitelistCmd extends Command {
                     }
                     break;
                 } else if (args.length > 2){
-                    // to many arguments
+                    // too many arguments
                     if (isPlayer) {
                         Communication.playerCfgMsg(player, remove, "toomany");
                     } else {
@@ -347,20 +351,24 @@ public class WhitelistCmd extends Command {
                 }
 
                 // remove from whitelist
-                if (Whitelist.removeWhitelist(uuid)) {
-                    // added successfully
-                    if (isPlayer) {
-                        Communication.playerCfgMsg(player, remove, "success", placeholders);
+                try {
+                    if (Whitelist.remove(uuid)) {
+                        // added successfully
+                        if (isPlayer) {
+                            Communication.playerCfgMsg(player, remove, "success", placeholders);
+                        } else {
+                            Communication.senderCfgMsg(sender, remove, "success", placeholders);
+                        }
                     } else {
-                        Communication.senderCfgMsg(sender, remove, "success", placeholders);
+                        // failed to add
+                        if (isPlayer) {
+                            Communication.playerCfgMsg(player, remove, "failed", placeholders);
+                        } else {
+                            Communication.senderCfgMsg(sender, remove, "failed", placeholders);
+                        }
                     }
-                } else {
-                    // failed to add
-                    if (isPlayer) {
-                        Communication.playerCfgMsg(player, remove, "failed", placeholders);
-                    } else {
-                        Communication.senderCfgMsg(sender, remove, "failed", placeholders);
-                    }
+                } catch (PluginConfigException e) {
+                    e.printStackTrace();
                 }
 
                 break;
