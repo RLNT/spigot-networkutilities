@@ -23,7 +23,7 @@ public class PluginConfig {
     private int keys;
 
     public PluginConfig(String name) throws PluginConfigException {
-        new PluginConfig(name, null, 0);
+        this(name, null, 0);
     }
 
     public PluginConfig(String name, String version, int keys) throws PluginConfigException {
