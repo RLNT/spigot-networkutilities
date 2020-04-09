@@ -37,6 +37,13 @@ connectionNotifications: true
 # target server is not online yet.
 waitForServer: true
 
+# RECONNECT ON CRASH MODULE #
+# This module will automatically reconnect a player to a fallback
+# server when the server they were on crashed.
+# The fallback server is defined by the hubServer option at the
+# top of the file.
+reconnectOnCrash: true
+
 # UUID BASED WHITELIST MODULE #
 # This module prevents players from joining the network if they
 # are not on the whitelist. It's UUID based so only valid premium

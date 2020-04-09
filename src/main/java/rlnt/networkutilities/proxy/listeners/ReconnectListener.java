@@ -1,9 +1,7 @@
 package rlnt.networkutilities.proxy.listeners;
 
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerConnectEvent;
 import net.md_5.bungee.api.event.ServerKickEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -13,8 +11,11 @@ import net.md_5.bungee.event.EventPriority;
 import rlnt.networkutilities.proxy.NetworkUtilities;
 import rlnt.networkutilities.proxy.utils.Communication;
 import rlnt.networkutilities.proxy.utils.Config;
+import rlnt.networkutilities.proxy.utils.General;
 import rlnt.networkutilities.proxy.utils.Server;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -26,61 +27,73 @@ public class ReconnectListener implements Listener {
 
     // config entries
     private Configuration options = Config.getOptions();
-    private Configuration messages = Config.getMessages().getSection("commands").getSection("reconnect");
+    private Configuration messages = Config.getMessages().getSection("reconnectOnCrash");
 
     private ServerInfo fallbackServer = Server.getServerByName(options.getString("hubServer"));
 
-    private static BaseComponent[] translateToComponent(String s) {
-        return TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', s));
-    }
-
-
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onServerKickEvent(ServerKickEvent event) {
-        // if there is a kick reason, the kick cannot be because of a crash -> ignore the event
-        if (event.getKickReasonComponent().length > 0) return;
-
         CountDownLatch doneSignal = new CountDownLatch(1);
-
         ServerInfo server = event.getKickedFrom();
 
         // ignore event if player got kicked from fallback server
         if (server == fallbackServer) return;
 
         // check if the server the player was kicked from is still online
-        server.ping((result, pingError) -> {
-            // ignore event if server is online
+        AtomicBoolean cancelEvent = new AtomicBoolean(false);
+        server.ping((pingResult, pingError) -> {
+            // cancel event if server is online
             if (pingError == null) {
+                doneSignal.countDown();
+                cancelEvent.set(true);
+            }
+        });
+        if (cancelEvent.get()) return;
+
+        // check if fallback server is online
+        fallbackServer.ping((pingResult, pingError) -> {
+            // cancel event if server is offline, kick player with reason
+            if (pingError == null) {
+                if (Config.messageEmpty(messages, "offline")) {
+                    event.setKickReasonComponent(General.colorize("&4Couldn't reconnect you because the fallback server is down!"));
+                } else {
+                    event.setKickReasonComponent(General.colorize(Config.getMessage(messages, "offline")));
+                }
+
+                doneSignal.countDown();
+                cancelEvent.set(true);
+            }
+        });
+        if (cancelEvent.get()) return;
+
+        ProxiedPlayer player = event.getPlayer();
+
+        // try to connect player to fallback server
+        player.connect(fallbackServer, (connectResult, connectError) -> {
+            if (connectError == null) {
+                // reconnect successful, send player message
+                Map<String, String> placeholders = new HashMap<>();
+                placeholders.put("{server}", fallbackServer.getName());
+                Communication.playerCfgMsg(player, messages, "success", placeholders);
+            } else {
+                // reconnect failed, kick player with reason
+                if (Config.messageEmpty(messages, "failed")) {
+                    event.setKickReasonComponent(General.colorize("&4Couldn't reconnect you to the fallback server!"));
+                } else {
+                    event.setKickReasonComponent(General.colorize(Config.getMessage(messages, "failed")));
+                }
+
                 doneSignal.countDown();
                 return;
             }
 
-            // try to connect player to fallback server
-            event.getPlayer().connect(fallbackServer, (connected, connectError) -> {
-                if (connectError != null) {
-                    event.setKickReasonComponent(translateToComponent(
-                        "The server you were on could not be reached.\n" +
-                            "Reconnecting to &c" + fallbackServer.getName() + "&e failed: " +
-                            connectError.toString()
-                    ));
+            // cancel event
+            event.setCancelServer(null);
+            event.setCancelled(true);
 
-                    logger.warning("Could not reconnect player");
-
-                    doneSignal.countDown();
-                    return;
-                }
-
-                // send message to player
-                Communication.playerCfgMsg(event.getPlayer(), messages, "reconnected");
-
-                // cancel event
-                event.setCancelServer(null);
-                event.setCancelled(true);
-
-                // count down latch
-                doneSignal.countDown();
-            }, ServerConnectEvent.Reason.LOBBY_FALLBACK);
-        });
+            // count down latch
+            doneSignal.countDown();
+        }, ServerConnectEvent.Reason.LOBBY_FALLBACK);
 
         // wait for at most one minute
         try {

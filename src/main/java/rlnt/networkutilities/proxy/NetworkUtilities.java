@@ -5,10 +5,7 @@ import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.config.Configuration;
 import rlnt.networkutilities.proxy.commands.HubCmd;
 import rlnt.networkutilities.proxy.commands.WhitelistCmd;
-import rlnt.networkutilities.proxy.listeners.ConNotifiesListener;
-import rlnt.networkutilities.proxy.listeners.PluginChannelListener;
-import rlnt.networkutilities.proxy.listeners.WaitForServerListener;
-import rlnt.networkutilities.proxy.listeners.WhitelistListener;
+import rlnt.networkutilities.proxy.listeners.*;
 import rlnt.networkutilities.proxy.plugin.PluginConfig;
 import rlnt.networkutilities.proxy.plugin.PluginConfigException;
 import rlnt.networkutilities.proxy.plugin.PluginLogger;
@@ -73,7 +70,7 @@ public class NetworkUtilities extends Plugin {
     @Override
     public void onDisable() {
         getProxy().unregisterChannel("networkutilities");
-        
+
         try {
             Whitelist.save();
         } catch (PluginConfigException e) {
@@ -116,6 +113,10 @@ public class NetworkUtilities extends Plugin {
 
         if (config.getBoolean("waitForServer", false))
             pm.registerListener(this, new WaitForServerListener());
+
+        if (config.getBoolean("reconnectOnCrash", false)) {
+            pm.registerListener(this, new ReconnectListener());
+        }
 
         if (whitelist != null)
             pm.registerListener(this, new WhitelistListener());
