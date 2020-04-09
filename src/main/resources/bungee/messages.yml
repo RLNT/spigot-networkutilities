@@ -692,4 +692,4 @@ commands:
 
 
 ### DON'T EDIT ANYTHING BELOW THIS LINE ###
-messagesVersion: "1.0.0"
+configVersion: "1.0.0"
