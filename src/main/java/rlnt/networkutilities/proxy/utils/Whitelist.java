@@ -3,9 +3,7 @@ package rlnt.networkutilities.proxy.utils;
 import rlnt.networkutilities.proxy.plugin.PluginConfig;
 import rlnt.networkutilities.proxy.plugin.PluginConfigException;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public enum Whitelist {
     ;
@@ -38,7 +36,9 @@ public enum Whitelist {
      * Loads the whitelist from the config file.
      */
     public static void load() {
-        whitelist.addAll(config.getConfig().getStringList("whitelist"));
+        List<String> list = config.getConfig().getStringList("whitelist");
+        list.removeIf(Objects::isNull);
+        if (!list.isEmpty()) whitelist.addAll(list);
     }
 
     /**
