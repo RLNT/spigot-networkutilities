@@ -146,6 +146,38 @@ waitForServer:
   playerMessage: "&cSorry &e%player%&c! &fThe server you are trying to connect to (&7%server%&f) is not online!"
 
 
+# RECONNECT ON CRASH MODULE MESSAGES #
+reconnectOnCrash:
+  # This message is sent when someone gets kicked from the network
+  # because the the fallback server for the reconnect is offline.
+  # Available placeholders:
+  #  none
+  offline: |-
+    &6&lNetworkUtilities
+    &r &r
+    &4Automatic reconnect failed!
+    &fThe fallback server is offline.
+
+  # This message is sent when someone was successfully reconnected
+  # to the fallback server.
+  # Available placeholders:
+  #  > {server} - the name of the fallback server
+  success:
+    enabled: true
+    message: "&cYour previous server has crashed! &aYou have been reconnected to the fallback server (&e{server}&a)."
+
+  # This message is sent when someone gets kicked from the network
+  # because they couldn't be reconnected to the fallback server.
+  # It can be caused by several reasons. It just tells the player
+  # that it didn't work.
+  # Available placeholders:
+  #  none
+  failed: |-
+    &6&lNetworkUtilities
+    &r &r
+    &4Automatic reconnect failed!
+
+
 ###################################################################
 ###                       COMMAND MESSAGES                      ###
 ###################################################################
