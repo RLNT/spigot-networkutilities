@@ -9,10 +9,7 @@ import rlnt.networkutilities.proxy.api.Minecraft;
 import rlnt.networkutilities.proxy.plugin.PluginConfigException;
 import rlnt.networkutilities.proxy.utils.*;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 public class WhitelistCmd extends Command {
@@ -33,7 +30,7 @@ public class WhitelistCmd extends Command {
      */
     private static String[] getCommandAlias() {
         if (options.getStringList("commandAlias").isEmpty()) {
-            return null;
+            return new String[0];
         } else {
             List<String> aliasesList = options.getStringList("commandAliases");
             return aliasesList.toArray(new String[0]);
