@@ -66,7 +66,7 @@ public class HubCmd extends Command {
     private static String[] getCommandAlias() {
         List<String> commandAliases = options.getStringList("commandAliases");
         if (commandAliases.isEmpty()) {
-            return null;
+            return new String[0];
         } else {
             return commandAliases.toArray(new String[0]);
         }
