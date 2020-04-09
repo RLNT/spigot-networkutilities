@@ -12,6 +12,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+// TODO: use hubServer from config top instead of command based target
+
 public class HubCmd extends Command {
 
     // config entries
@@ -100,10 +102,7 @@ public class HubCmd extends Command {
             }
         } else if (Player.getPlayerNames().contains(subcommand)) {
             // another player's username was entered, send player to hub
-            if (isPlayer) {
-                // check permission
-                if (!Player.hasPermission(player, permission + ".other")) return;
-            }
+            if (isPlayer && !Player.hasPermission(player, permission + ".other")) return;
 
             // messages
             Configuration other = messages.getSection("other");
@@ -183,10 +182,7 @@ public class HubCmd extends Command {
             });
         } else if (networkServers.contains(subcommand)) {
             // a server's name was entered, send server players to hub
-            if (isPlayer) {
-                // check permission
-                if (!Player.hasPermission(player, permission + ".server")) return;
-            }
+            if (isPlayer && !Player.hasPermission(player, permission + ".server")) return;
 
             // messages
             Configuration server = messages.getSection("server");
@@ -317,10 +313,7 @@ public class HubCmd extends Command {
             });
         } else if (subcommand.equals("all") || subcommand.equals("network")) {
             // network was entered, send network players to hub
-            if (isPlayer) {
-                // check permission
-                if (!Player.hasPermission(player, permission + ".network")) return;
-            }
+            if (isPlayer && !Player.hasPermission(player, permission + ".network")) return;
 
             // messages
             Configuration network = messages.getSection("network");
