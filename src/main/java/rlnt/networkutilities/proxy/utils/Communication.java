@@ -24,19 +24,28 @@ public enum Communication {
     }
 
     /**
-     * Will kick a player with a colorized message.
-     * Replaces the message with a placeholder if
-     * it is empty: &cYou have been kicked!
+     * Will kick a player with a colorized message of
+     * the config.
      *
      * @param player the player to kick
-     * @param message the kick message
+     * @param section the configuration section
+     * @param type the type of the message
+     * @param placeholders the placeholders to replace in the message
      */
-    public static void playerKickMsg(ProxiedPlayer player, String message) {
-        if (message == null || message.isEmpty()) {
+    public static void playerCfgKick(ProxiedPlayer player, Configuration section, String type, Map<String, String> placeholders) {
+        if (Config.messageEmpty(section, type)) {
             player.disconnect(General.colorize("&cYou have been kicked!"));
-        } else {
-            player.disconnect(General.colorize(message));
+            return;
         }
+
+        String message = Config.getMessage(section, type);
+        if (placeholders != null && !placeholders.isEmpty()) {
+            for (String placeholder : placeholders.keySet()) {
+                message = message.replace(placeholder, placeholders.get(placeholder));
+            }
+        }
+
+        player.disconnect(General.colorize(message));
     }
 
     /**

@@ -7,40 +7,46 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
-import rlnt.networkutilities.proxy.NetworkUtilities;
 import rlnt.networkutilities.proxy.utils.Communication;
+import rlnt.networkutilities.proxy.utils.Config;
 import rlnt.networkutilities.proxy.utils.Location;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class WaitForServerListener implements Listener {
 
-    private Configuration messages = NetworkUtilities.getInstance().getMessages().getSection("waitForServer");
+    private Configuration messages = Config.getMessages().getSection("waitForServer");
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void waitForServer(ServerConnectEvent event) {
 
         if (event.isCancelled()) return;
 
+        // variables
         ProxiedPlayer player = event.getPlayer();
-        ServerInfo server = Location.getPlayerLocation(player);
-        ServerInfo target = event.getTarget();
+        ServerInfo lastServer = Location.getPlayerLocation(player);
+        ServerInfo targetServer = event.getTarget();
 
-        target.ping((result, error) -> {
-            if (error != null) {
-                event.setCancelled(true);
+        // check if target server is online
+        targetServer.ping((pingResult, pingError) -> {
+            if (pingError != null) {
+                // server is offline
+                // placeholder logic
+                Map<String, String> placeholders = new HashMap<>();
+                placeholders.put("{player}", player.getName());
+                placeholders.put("{server}", targetServer.getName());
 
-                if (server == null) {
+                // check if last server is defined
+                if (lastServer == null) {
                     // player tries to connect to the network
-                    Communication.sendPlayerKickMessage(player, messages.getString("kickMessage")
-                            .replace("%player%", player.getName())
-                            .replace("%server%", target.getName())
-                    );
+                    Communication.playerCfgKick(player, messages, "kick", placeholders);
                 } else {
                     // player is on the network and tries to connect to an offline server
-                    Communication.sendPlayerMessage(player, messages.getString("playerMessage")
-                            .replace("%player%", player.getName())
-                            .replace("%server%", target.getName())
-                    );
+                    Communication.playerCfgMsg(player, messages, "player", placeholders);
                 }
+
+                event.setCancelled(true);
             }
         });
     }
