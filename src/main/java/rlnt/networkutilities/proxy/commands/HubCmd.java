@@ -29,6 +29,51 @@ public class HubCmd extends Command {
         super(getCommandName(), permission, getCommandAlias());
     }
 
+    /**
+     * Will return the command name which lets the player use the command
+     * by the String set in the config.
+     *
+     * @return the command name
+     */
+    private static String getCommandName() {
+        String commandName = options.getString("commandName");
+        if (commandName == null || commandName.isEmpty()) {
+            return "hub";
+        } else {
+            return commandName;
+        }
+    }
+
+    /**
+     * Will return the command permission which the player needs to use the
+     * command. The permission will be changed by the command name.
+     *
+     * @return the command permission or null if disabled
+     */
+    private static String getCommandPermission() {
+        String commandName = options.getString("commandName");
+        if (commandName == null || commandName.isEmpty()) {
+            return "nwutils.command.hub";
+        } else {
+            return "nwutils.command." + commandName;
+        }
+    }
+
+    /**
+     * Will return the command alias which has the same execution
+     * functionality like the command name.
+     *
+     * @return the command alias
+     */
+    private static String[] getCommandAlias() {
+        List<String> commandAliases = options.getStringList("commandAliases");
+        if (commandAliases.isEmpty()) {
+            return null;
+        } else {
+            return commandAliases.toArray(new String[0]);
+        }
+    }
+
     @Override
     public void execute(CommandSender sender, String[] args) {
 
@@ -413,51 +458,6 @@ public class HubCmd extends Command {
             } else {
                 Communication.senderCfgMsg(sender, help, "console");
             }
-        }
-    }
-
-    /**
-     * Will return the command name which lets the player use the command
-     * by the String set in the config.
-     *
-     * @return the command name
-     */
-    private static String getCommandName() {
-        String commandName = options.getString("commandName");
-        if (commandName == null || commandName.isEmpty()) {
-            return "hub";
-        } else {
-            return commandName;
-        }
-    }
-
-    /**
-     * Will return the command permission which the player needs to use the
-     * command. The permission will be changed by the command name.
-     *
-     * @return the command permission or null if disabled
-     */
-    private static String getCommandPermission() {
-        String commandName = options.getString("commandName");
-        if (commandName == null || commandName.isEmpty()) {
-            return "nwutils.command.hub";
-        } else {
-            return "nwutils.command." + commandName;
-        }
-    }
-
-    /**
-     * Will return the command alias which has the same execution
-     * functionality like the command name.
-     *
-     * @return the command alias
-     */
-    private static String[] getCommandAlias() {
-        List<String> commandAliases = options.getStringList("commandAliases");
-        if (commandAliases.isEmpty()) {
-            return null;
-        } else {
-            return commandAliases.toArray(new String[0]);
         }
     }
 }
