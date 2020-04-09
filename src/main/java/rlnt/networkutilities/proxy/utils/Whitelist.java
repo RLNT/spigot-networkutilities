@@ -38,6 +38,7 @@ public enum Whitelist {
     public static void load() {
         List<String> list = config.getConfig().getStringList("whitelist");
         list.removeIf(Objects::isNull);
+        list.removeIf(uuid -> !General.isUuid(uuid));
         if (!list.isEmpty()) whitelist.addAll(list);
     }
 
