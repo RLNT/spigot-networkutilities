@@ -4,6 +4,7 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import rlnt.networkutilities.proxy.NetworkUtilities;
+import rlnt.networkutilities.proxy.plugin.PluginConfigException;
 
 import java.util.regex.Pattern;
 
@@ -52,5 +53,11 @@ public enum General {
         instance.getProxy().getPluginManager().unregisterCommands(instance);
         instance.getProxy().getPluginManager().unregisterListeners(instance);
         instance.getProxy().unregisterChannel("networkutilities");
+
+        try {
+            Whitelist.save();
+        } catch (PluginConfigException e) {
+            e.printStackTrace();
+        }
     }
 }
