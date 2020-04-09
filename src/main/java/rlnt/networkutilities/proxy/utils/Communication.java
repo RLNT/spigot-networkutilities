@@ -61,7 +61,7 @@ public enum Communication {
      * @param placeholders the placeholders to replace in the message
      */
     public static void playerCfgMsg(ProxiedPlayer player, Configuration section, String type, Map<String, String> placeholders) {
-        if (!Config.messageEnabled(section, type)) return;
+        if (Config.messageDisabled(section, type)) return;
         if (Config.messageEmpty(section, type)) return;
 
         String message = Config.getMessage(section, type);
@@ -108,7 +108,7 @@ public enum Communication {
      * @param placeholders the placeholders to replace in the message
      */
     public static void senderCfgMsg(CommandSender sender, Configuration section, String type, Map<String, String> placeholders) {
-        if (!Config.messageEnabled(section, type)) return;
+        if (Config.messageDisabled(section, type)) return;
         if (Config.messageEmpty(section, type)) return;
 
         String message = Config.getMessage(section, type);
@@ -161,7 +161,7 @@ public enum Communication {
      */
     public static void groupCfgMsg(Collection<ProxiedPlayer> group, Configuration section, String type, Map<String, String> placeholders) {
         if (group.isEmpty()) return;
-        if (!Config.messageEnabled(section, type)) return;
+        if (Config.messageDisabled(section, type)) return;
         if (Config.messageEmpty(section, type)) return;
 
         String message = Config.getMessage(section, type);
@@ -197,7 +197,7 @@ public enum Communication {
      * @param placeholders the placeholders to replace in the message
      */
     public static void networkCfgMsg(Configuration section, String type, Map<String, String> placeholders) {
-        if (!Config.messageEnabled(section, type)) return;
+        if (Config.messageDisabled(section, type)) return;
         if (Config.messageEmpty(section, type)) return;
 
         String message = Config.getMessage(section, type);

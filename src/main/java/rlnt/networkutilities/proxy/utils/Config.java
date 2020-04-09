@@ -69,8 +69,8 @@ public enum Config {
      * @param type the type of the section
      * @return boolean if the section is enabled
      */
-    public static boolean messageEnabled(Configuration section, String type) {
-        return section.getSection(type).getBoolean("enabled", false);
+    public static boolean messageDisabled(Configuration section, String type) {
+        return !section.getSection(type).getBoolean("enabled", false);
     }
 
     /**
