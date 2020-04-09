@@ -78,17 +78,17 @@ public class WhitelistCmd extends Command {
             subcommand = args[0];
         }
 
-        Configuration helpText = messages.getSection("help");
+        Configuration help = messages.getSection("help");
 
         // sub command logic
         if (subcommand == null) {
             // nothing or ? has been entered, display help text
             if (isPlayer) {
                 // player used the command
-                Communication.playerCfgMsg(player, helpText, "player");
+                Communication.playerCfgMsg(player, help, "player");
             } else {
                 // nonplayer used the command
-                Communication.senderCfgMsg(sender, helpText, "nonplayer");
+                Communication.senderCfgMsg(sender, help, "console");
             }
             return;
         }
@@ -308,6 +308,11 @@ public class WhitelistCmd extends Command {
                     e.printStackTrace();
                 }
                 break;
+            }
+            default: {
+                // unknown sub command was entered
+                BiConsumer<String, Map<String, String>> msg = (token, placeholders) -> message.accept(help, token, placeholders);
+                msg.accept("unknown", null);
             }
         }
     }
