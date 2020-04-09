@@ -10,7 +10,7 @@ import rlnt.networkutilities.spigot.NetworkUtilities;
 
 public class ServerNotifications implements Listener {
 
-    ConfigurationSection options = NetworkUtilities.getInstance().getConfig().getConfigurationSection("serverNotifications");
+    private ConfigurationSection options = NetworkUtilities.getInstance().getConfig().getConfigurationSection("serverNotifications");
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoin(PlayerJoinEvent event) {

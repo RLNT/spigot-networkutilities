@@ -89,10 +89,7 @@ public class WhitelistCmd extends Command {
         switch (subcommand) {
             case "check": {
                 // TODO: make text clickable to add or remove the player to/from the whitelist
-                if (isPlayer) {
-                    // player entered the command
-                    if (!Player.hasPermission(player, "networkutilities.command.whitelist.check")) break;
-                }
+                if (isPlayer && !Player.hasPermission(player, "networkutilities.command.whitelist.check")) break;
 
                 Configuration check = messages.getSection("check");
                 Consumer<String> msg = token -> message.accept(check, token);
@@ -157,10 +154,7 @@ public class WhitelistCmd extends Command {
             case "list": {
                 // TODO: make the list pageable
                 // TODO: make GUI for list
-                if (isPlayer) {
-                    // player entered the command
-                    if (!Player.hasPermission(player, "networkutilities.command.whitelist.list")) break;
-                }
+                if (isPlayer && !Player.hasPermission(player, "networkutilities.command.whitelist.list")) break;
 
                 Configuration list = messages.getSection("list");
                 Consumer<String> msg = token -> message.accept(list, token);
@@ -268,10 +262,7 @@ public class WhitelistCmd extends Command {
             }
             case "remove":
             case "delete": {
-                if (isPlayer) {
-                    // player entered the command
-                    if (!Player.hasPermission(player, "networkutilities.command.whitelist.remove")) break;
-                }
+                if (isPlayer && !Player.hasPermission(player, "networkutilities.command.whitelist.remove")) break;
 
                 Configuration remove = messages.getSection("remove");
                 Consumer<String> msg = token -> message.accept(remove, token);

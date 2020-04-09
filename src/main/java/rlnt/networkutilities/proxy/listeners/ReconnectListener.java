@@ -37,7 +37,7 @@ public class ReconnectListener implements Listener {
         ServerInfo server = event.getKickedFrom();
 
         // ignore event if player got kicked from fallback server
-        if (server == fallbackServer) return;
+        if (server.equals(fallbackServer)) return;
 
         // check if the server the player was kicked from is still online
         AtomicBoolean cancelEvent = new AtomicBoolean(false);

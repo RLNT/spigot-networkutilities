@@ -51,9 +51,6 @@ public final class NetworkUtilities extends JavaPlugin {
         }
     }
 
-    @Override
-    public void onDisable() {}
-
     private void configs() {
         try {
             config = new Config("config.yml", this).getConfig();
