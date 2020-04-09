@@ -2,7 +2,6 @@ package rlnt.networkutilities.proxy.utils;
 
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.config.Configuration;
 
@@ -21,7 +20,7 @@ public enum Communication {
      */
     public static void playerMsg(ProxiedPlayer player, String message) {
         if (message == null || message.isEmpty()) return;
-        player.sendMessage(new TextComponent(General.colorize(message)));
+        player.sendMessage(General.colorize(message));
     }
 
     /**
@@ -34,9 +33,9 @@ public enum Communication {
      */
     public static void playerKickMsg(ProxiedPlayer player, String message) {
         if (message == null || message.isEmpty()) {
-            player.disconnect(new TextComponent(General.colorize("&cYou have been kicked!")));
+            player.disconnect(General.colorize("&cYou have been kicked!"));
         } else {
-            player.disconnect(new TextComponent(General.colorize(message)));
+            player.disconnect(General.colorize(message));
         }
     }
 
@@ -84,7 +83,7 @@ public enum Communication {
      */
     public static void senderMsg(CommandSender sender, String message) {
         if (message == null || message.isEmpty()) return;
-        sender.sendMessage(new TextComponent(General.colorize(message)));
+        sender.sendMessage(General.colorize(message));
     }
 
     /**
@@ -133,7 +132,7 @@ public enum Communication {
         if (group.isEmpty()) return;
         if (message == null || message.isEmpty()) return;
         for (ProxiedPlayer player : group) {
-            player.sendMessage(new TextComponent(General.colorize(message)));
+            player.sendMessage(General.colorize(message));
         }
     }
 
@@ -185,7 +184,7 @@ public enum Communication {
 
         Collection<ProxiedPlayer> network = ProxyServer.getInstance().getPlayers();
         for (ProxiedPlayer player : network) {
-            player.sendMessage(new TextComponent(General.colorize(message)));
+            player.sendMessage(General.colorize(message));
         }
     }
 

@@ -1,6 +1,8 @@
 package rlnt.networkutilities.proxy.utils;
 
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import rlnt.networkutilities.proxy.NetworkUtilities;
 
 import java.util.regex.Pattern;
@@ -26,10 +28,10 @@ public enum General {
      * Will colorize a given message by alternate color codes.
      *
      * @param message the message that should be colorized
-     * @return the colorized message
+     * @return the colorized message as TextComponent
      */
-    public static String colorize(String message) {
-        return ChatColor.translateAlternateColorCodes('&', message);
+    public static BaseComponent[] colorize(String message) {
+        return TextComponent.fromLegacyText(ChatColor.translateAlternateColorCodes('&', message));
     }
 
     /**
