@@ -65,7 +65,6 @@ commands:
   hub:
     enabled: true             # should the command be enabled?
     targetServer: "Lobby"     # what's the name of your hub/lobby server? it's case-insensitive
-    permissionRequired: true  # should this command require a permission?
     commandName: "hub"        # what should be the main command? it's case-sensitive
     commandAliases:           # what command aliases do you want? they're case-sensitive
       - lobby
@@ -76,9 +75,8 @@ commands:
   # This command allows modification of the UUID based whitelist.
   # It is automatically disabled if the whitelist module is disabled
   whitelist:
-    enabled: true
-    permissionRequired: true
-    commandAliases:
+    enabled: true             # should the command be enabled?
+    commandAliases:           # what command aliases do you want? they're case-sensitive
       - wl
       - whitel
 

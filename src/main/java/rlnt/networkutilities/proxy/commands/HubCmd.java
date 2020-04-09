@@ -445,8 +445,6 @@ public class HubCmd extends Command {
      * @return the command permission or null if disabled
      */
     private static String getCommandPermission() {
-        if (!options.getBoolean("permissionRequired", true)) return null;
-
         String commandName = options.getString("commandName");
         if (commandName == null || commandName.isEmpty()) {
             return "nwutils.command.hub";

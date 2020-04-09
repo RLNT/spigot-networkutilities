@@ -16,8 +16,6 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-// TODO: permission required option kann weg, aus config entfernen und aus allen commands
-
 public class WhitelistCmd extends Command {
 
     // config entries
