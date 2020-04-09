@@ -4,11 +4,15 @@
 # In this file, you can adjust all messages of the plugin.        #
 #                                                                 #
 # Each message can be toggled by adjusting the <enabled> key.     #
+# There are exceptions that you can't toggle for example kick     #
+# messages. These are also replaced with a default phrase if you  #
+# leave them empty to prevent errors.                             #
+#                                                                 #
 # You can use color and formatting codes.                         #
 # Placeholders that are available for each message are explained  #
 # in the section above it.                                        #
 #                                                                 #
-# You can also use multine messages. That requires special form:  #
+# You can use multine messages which requires a special form:     #
 #                                                                 #
 # message: |-                                                     #
 #   Whatever my line 1 should be                                  #
@@ -128,22 +132,22 @@ waitForServer:
   # because the server the player is trying to connect to is not
   # online yet.
   # Available placeholders:
-  #  > %player% - the name of the player that tried to connect
-  #  > %server% - the name of the server the player tried to connect to
-  kickMessage: |-
+  #  > {player} - the name of the player that tried to connect
+  #  > {server} - the name of the server the player tried to connect to
+  kick: |-
     &4&lYOUR CONNECTION WAS CANCELLED!
     &r &r
     &cThe server you are trying to connect to is not online at the moment!
     &r &r
-    &bPlayer: &f%player%
-    &bServer: &c%server%
+    &bPlayer: &f{player}
+    &bServer: &c{server}
 
   # This message is sent when someone tries to connect to a server
   # that isn't currently online.
   # Available placeholders:
-  #  > %player% - the name of the player that tried to connect
-  #  > %server% - the name of the server the player tried to connect to
-  playerMessage: "&cSorry &e%player%&c! &fThe server you are trying to connect to (&7%server%&f) is not online!"
+  #  > {player} - the name of the player that tried to connect
+  #  > {server} - the name of the server the player tried to connect to
+  player: "&cSorry &e{player}&c! &fThe server you are trying to connect to (&7{server}&f) is not online!"
 
 
 # RECONNECT ON CRASH MODULE MESSAGES #
@@ -476,95 +480,212 @@ commands:
 
   # whitelist command specific messages
   whitelist:
+    # all messages to help the player with the whitelist command
     help:
+      # This message is sent to a player when they use the ? sub command.
+      # It's kinda the help page for the command.
+      # Available placeholders:
+      #  none
       player:
         enabled: true
         message: |-
           &r &r
           &8> &6NetworkUtilities Command Help &8<
           &r &r
-          &f Usage:
-          &7 /&ewhitelist &aadd&7/&aremove&7/&acheck &buuid&7/&bplayer
+          &7 /&ewhitelist &a?
+          &7  Will show this command help text.
+          &7 /&ewhitelist &alist
+          &7  Will show all whitelisted UUIDs.
+          &7 /&ewhitelist &acheck &8<&aplayer&7|&aUUID&8>
+          &7  Will check if a player/UUID is whitelisted.
+          &7 /&ewhitelist &aadd &8<&aplayer&7|&aUUID&8>
+          &7  Will add a player/UUID to the whitelist.
+          &7 /&ewhitelist &aremove &8<&aplayer&7|&aUUID&8>
+          &7  Will remove a player/UUID from the whitelist.
           &r &r
-      nonplayer:
-        enabled: true
-        message: "&cIncorrect usage! &eUsage: &7/&fwhitelist &aadd&7/&aremove&7/&acheck &buuid&7/&bplayer"
 
-    check:
-      missing:
+      # This message is sent to a nonplayer e.g. the console when they use the ? sub command.
+      # It's kinda the help page for the command.
+      # Available placeholders:
+      #  none
+      console:
         enabled: true
-        message: "&4Please enter a UUID or player you want to check! &fUsage: &7/&ewhitelist check &7<&aUUID&7|&aplayer&7>"
-      toomany:
-        enabled: true
-        message: "&4You entered too many arguments! &fUsage: &7/&ewhitelist check &7<&aUUID&7|&aplayer&7>"
-      invalidUuid:
-        enabled: true
-        message: "&4The UUID you have entered was invalid! &fUsage: &7/&ewhitelist check &7<&aUUID&7|&aplayer&7>"
-      invalidName:
-        enabled: true
-        message: "&4The player you have entered was invalid! &fUsage: &7/&ewhitelist check &7<&aUUID&7|&aplayer&7>"
-      whitelisted:
-        enabled: true
-        message: "&aThe requested player &e({uuid}) &ais whitelisted!"
-      notWhitelisted:
-        enabled: true
-        message: "&cThe requested player &e({uuid}) &cis not whitelisted!"
+        message: "&eWhitelist command usage: &7/&fwhitelist &8<&a?&7|&alist&7|&acheck&7|&aadd&7|&aremove&8> &8<&aplayer&7|&aUUID&8>"
 
+      # This message is displayed when someone uses an unknown sub command.
+      # Available placeholders:
+      #  none
+      unknown:
+        enabled: true
+        message: "&cYou entered an unknown sub command!"
+
+    # These messages are for the list sub command.
     list:
+      # This message is displayed when someone uses too many arguments for the list sub command.
+      # Available placeholders:
+      #  none
       toomany:
         enabled: true
         message: "&4You entered too many arguments! &fUsage: &7/&ewhitelist list"
+
+      # This message is displayed to the player that used the list sub command.
+      # Available placeholders:
+      #  > {whitelist} - the whitelist as UUIDs
       player:
         enabled: true
         message: |-
           &6Whitelisted UUIDs:
           &f{whitelist}
+
+      # This message is displayed to nonplayers e.g. the console that used the list sub command.
+      # Available placeholders:
+      #  > {whitelist} - the whitelist as UUIDs
       console:
         enabled: true
         message: "&6Whitelisted UUIDs: &f{whitelist}"
 
+    # These messages are for the check sub command.
+    check:
+      # This message is displayed when someone misses an argument for the check sub command.
+      # Available placeholders:
+      #  none
+      missing:
+        enabled: true
+        message: "&4Please enter a UUID or player you want to check! &fUsage: &7/&ewhitelist check &7<&aUUID&7|&aplayer&7>"
+
+      # This message is displayed when someone uses too many arguments for the check sub command.
+      # Available placeholders:
+      #  none
+      toomany:
+        enabled: true
+        message: "&4You entered too many arguments! &fUsage: &7/&ewhitelist check &7<&aUUID&7|&aplayer&7>"
+
+      # This message is displayed when someone entered an invalid UUID for the check sub command.
+      # Available placeholders:
+      #  none
+      invalidUuid:
+        enabled: true
+        message: "&4The UUID you have entered was invalid! &fUsage: &7/&ewhitelist check &7<&aUUID&7|&aplayer&7>"
+
+      # This message is displayed when someone entered an invalid player name for the check sub command.
+      # Available placeholders:
+      #  none
+      invalidName:
+        enabled: true
+        message: "&4The player you have entered was invalid! &fUsage: &7/&ewhitelist check &7<&aUUID&7|&aplayer&7>"
+
+      # This message is displayed when a player/UUID is whitelisted.
+      # Available placeholders:
+      #  > {uuid} - the UUID that was checked
+      whitelisted:
+        enabled: true
+        message: "&aThe requested player &e({uuid}) &ais whitelisted!"
+
+      # This message is displayed when a player/UUID is not whitelisted.
+      # Available placeholders:
+      #  > {uuid} - the UUID that was checked
+      notWhitelisted:
+        enabled: true
+        message: "&cThe requested player &e({uuid}) &cis not whitelisted!"
+
+    # These messages are for the add sub command.
     add:
+      # This message is displayed when someone misses an argument for the add sub command.
+      # Available placeholders:
+      #  none
       missing:
         enabled: true
         message: "&4Please enter a UUID or player you want to add! &fUsage: &7/&ewhitelist add &7<&aUUID&7|&aplayer&7>"
+
+      # This message is displayed when someone uses too many arguments for the add sub command.
+      # Available placeholders:
+      #  none
       toomany:
         enabled: true
         message: "&4You entered too many arguments! &fUsage: &7/&ewhitelist add &7<&aUUID&7|&aplayer&7>"
+
+      # This message is displayed when someone entered an invalid UUID for the add sub command.
+      # Available placeholders:
+      #  none
       invalidUuid:
         enabled: true
         message: "&4The UUID you have entered was invalid! &fUsage: &7/&ewhitelist add &7<&aUUID&7|&aplayer&7>"
+
+      # This message is displayed when someone entered an invalid player name for the add sub command.
+      # Available placeholders:
+      #  none
       invalidName:
         enabled: true
         message: "&4The player you have entered was invalid! &fUsage: &7/&ewhitelist add &7<&aUUID&7|&aplayer&7>"
+
+      # This message is displayed when a player/UUID is already whitelisted.
+      # Available placeholders:
+      #  > {uuid} - the UUID that the user tried to add
       already:
         enabled: true
         message: "&eThe requested player &a({uuid}) &eis already whitelisted!"
+
+      # This message is displayed when a player/UUID is successfully whitelisted.
+      # Available placeholders:
+      #  > {uuid} - the UUID that was whitelisted
       success:
         enabled: true
         message: "&aThe requested player &e({uuid}) &awas whitelisted!"
+
+      # This message is displayed when a player/UUID couldn't be whitelisted.
+      # Available placeholders:
+      #  > {uuid} - the UUID that couldn't be whitelisted
       failed:
         enabled: true
         message: "&cThe requested player &e({uuid}) &ccouldn't be whitelisted!"
 
+    # These messages are for the remove sub command.
     remove:
+      # This message is displayed when someone misses an argument for the remove sub command.
+      # Available placeholders:
+      #  none
       missing:
         enabled: true
         message: "&4Please enter a UUID or player you want to remove! &fUsage: &7/&ewhitelist remove &7<&aUUID&7|&aplayer&7>"
+
+      # This message is displayed when someone uses too many arguments for the remove sub command.
+      # Available placeholders:
+      #  none
       toomany:
         enabled: true
         message: "&4You entered too many arguments! &fUsage: &7/&ewhitelist remove &7<&aUUID&7|&aplayer&7>"
+
+      # This message is displayed when someone entered an invalid UUID for the remove sub command.
+      # Available placeholders:
+      #  none
       invalidUuid:
         enabled: true
         message: "&4The UUID you have entered was invalid! &fUsage: &7/&ewhitelist remove &7<&aUUID&7|&aplayer&7>"
+
+      # This message is displayed when someone entered an invalid player name for the remove sub command.
+      # Available placeholders:
+      #  none
       invalidName:
         enabled: true
         message: "&4The player you have entered was invalid! &fUsage: &7/&ewhitelist remove &7<&aUUID&7|&aplayer&7>"
+
+      # This message is displayed when a player/UUID is not whitelisted.
+      # Available placeholders:
+      #  > {uuid} - the UUID that the user tried to remove
       already:
         enabled: true
         message: "&eThe requested player &a({uuid}) &eis not whitelisted!"
+
+      # This message is displayed when a player/UUID is successfully removed from the whitelist.
+      # Available placeholders:
+      #  > {uuid} - the UUID that was removed from the whitelist
       success:
         enabled: true
         message: "&aThe requested player &e({uuid}) &awas removed from the Whitelist!"
+
+      # This message is displayed when a player/UUID couldn't be removed from the whitelist.
+      # Available placeholders:
+      #  > {uuid} - the UUID that couldn't be removed from the whitelist
       failed:
         enabled: true
         message: "&cThe requested player &e({uuid}) &ccouldn't be removed from the whitelist!"
