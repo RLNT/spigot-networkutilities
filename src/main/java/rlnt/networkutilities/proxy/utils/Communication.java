@@ -153,19 +153,6 @@ public enum Communication {
      * @param group the group of player to send the message to
      * @param section the configuration section
      * @param type the type of the message
-     */
-    public static void groupCfgMsg(Collection<ProxiedPlayer> group, Configuration section, String type) {
-        groupCfgMsg(group, section, type, null);
-    }
-
-    /**
-     * Will send a colorized message from the config
-     * to a given group of players if the group and
-     * the message are not empty.
-     *
-     * @param group the group of player to send the message to
-     * @param section the configuration section
-     * @param type the type of the message
      * @param placeholders the placeholders to replace in the message
      */
     public static void groupCfgMsg(Collection<ProxiedPlayer> group, Configuration section, String type, Map<String, String> placeholders) {

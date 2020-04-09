@@ -31,6 +31,7 @@ public enum Player {
      * @param permission the permission to check
      * @return true if the player has the permission, false if not
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public static boolean hasPermission(ProxiedPlayer player, String permission) {
         if (player.hasPermission(permission)) {
             return true;

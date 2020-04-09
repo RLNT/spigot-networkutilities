@@ -40,16 +40,6 @@ public enum Config {
     }
 
     /**
-     * Will return the current whitelist as a
-     * Configuration.
-     *
-     * @return the whitelist configuration
-     */
-    public static Configuration getWhitelist() {
-        return instance.getWhitelist().getConfig();
-    }
-
-    /**
      * Will reload all configs.
      *
      * @throws PluginConfigException when something in the
