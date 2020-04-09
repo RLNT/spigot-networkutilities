@@ -62,7 +62,7 @@ public class NetworkUtilities extends Plugin {
             logger.info("&a  > &fListeners loaded...");
             logger.info("&6 <============================================>");
         } catch (PluginConfigException e) {
-            logger.severe(e.toString());
+            e.printStackTrace();
             General.disablePlugin();
         }
     }

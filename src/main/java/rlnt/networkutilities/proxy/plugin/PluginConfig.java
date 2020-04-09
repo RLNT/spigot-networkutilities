@@ -103,8 +103,8 @@ public class PluginConfig {
         try {
             ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, file);
         } catch (IOException e) {
-            logger.severe("&c  > &e" + name + " &4couldn't be saved!");
-            throw new PluginConfigException("Saveing config" + name, e);
+            logger.severe("&c  > &c" + name + " &ecouldn't be saved!");
+            throw new PluginConfigException("Saving config " + name, e);
         }
     }
 }

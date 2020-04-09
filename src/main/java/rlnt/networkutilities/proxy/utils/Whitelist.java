@@ -10,12 +10,13 @@ import java.util.UUID;
 public enum Whitelist {
     ;
 
-    // hashset to store the uuid based network whitelist
-    private static Set<String> whitelist = new HashSet<>();
     private static PluginConfig config;
 
+    // hashset to store the uuid based network whitelist
+    private static Set<String> whitelist = new HashSet<>();
+
     /**
-     * Save the whitelist
+     * Saves the whitelist to the config file.
      */
     public static void save() throws PluginConfigException {
         config.getConfig().set("whitelist", whitelist);
@@ -23,7 +24,7 @@ public enum Whitelist {
     }
 
     /**
-     * Load the whitelist from a {@link PluginConfig}.
+     * Loads the whitelist from the {@link PluginConfig}.
      * This overrides the current config but no whitelist entries.
      *
      * @param config the config to load
@@ -34,7 +35,7 @@ public enum Whitelist {
     }
 
     /**
-     * Load the whitelist.
+     * Loads the whitelist from the config file.
      */
     public static void load() {
         whitelist.addAll(config.getConfig().getStringList("whitelist"));
