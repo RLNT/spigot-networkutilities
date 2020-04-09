@@ -14,7 +14,6 @@ import rlnt.networkutilities.proxy.utils.General;
 import rlnt.networkutilities.proxy.utils.Player;
 import rlnt.networkutilities.proxy.utils.Whitelist;
 
-// TODO: automatic reconnect
 // TODO: block commands
 
 public class NetworkUtilities extends Plugin {
@@ -30,10 +29,10 @@ public class NetworkUtilities extends Plugin {
     private Configuration config;
 
     private String optionsVersion = "1.0.0";
-    private int optionsKeys = 5;
+    private int optionsKeys = 8;
 
     private String messagesVersion = "1.0.0";
-    private int messagesKeys = 5;
+    private int messagesKeys = 6;
 
     @Override
     public void onEnable() {
