@@ -64,7 +64,6 @@ commands:
   # This command allows to teleport to the hub/lobby server.
   hub:
     enabled: true             # should the command be enabled?
-    targetServer: "Lobby"     # what's the name of your hub/lobby server? it's case-insensitive
     commandName: "hub"        # what should be the main command? it's case-sensitive
     commandAliases:           # what command aliases do you want? they're case-sensitive
       - lobby

@@ -12,8 +12,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-// TODO: use hubServer from config top instead of command based target
-
 public class HubCmd extends Command {
 
     // config entries
@@ -21,7 +19,7 @@ public class HubCmd extends Command {
     private Configuration messages = Config.getMessages().getSection("commands").getSection("hub");
 
     private static String permission = getCommandPermission();
-    private String targetServer = options.getString("targetServer");
+    private String targetServer = Config.getOptions().getString("hubServer");
     private ServerInfo target = Server.getServerByName(targetServer);
     private Set<String> networkServers = Server.getServerNames();
 
