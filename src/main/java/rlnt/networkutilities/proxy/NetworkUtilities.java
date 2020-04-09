@@ -71,7 +71,7 @@ public class NetworkUtilities extends Plugin {
         getProxy().unregisterChannel("networkutilities");
 
         try {
-            Whitelist.save();
+            if (whitelist != null) Whitelist.save();
         } catch (PluginConfigException e) {
             e.printStackTrace();
         }
