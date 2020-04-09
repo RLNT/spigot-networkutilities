@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class WhitelistCmd extends Command {
 
@@ -55,11 +54,19 @@ public class WhitelistCmd extends Command {
             player = null;
         }
 
-        BiConsumer<Configuration, String> message = (section, token) -> {
+        TriConsumer<Configuration, String, Map<String, String>> message = (section, token, placeholders) -> {
             if (isPlayer) {
-                Communication.playerCfgMsg(player, section, token);
+                if (placeholders == null) {
+                    Communication.playerCfgMsg(player, section, token);
+                } else {
+                    Communication.playerCfgMsg(player, section, token, placeholders);
+                }
             } else {
-                Communication.senderCfgMsg(sender, section, token);
+                if (placeholders == null) {
+                    Communication.senderCfgMsg(sender, section, token);
+                } else {
+                    Communication.senderCfgMsg(sender, section, token, placeholders);
+                }
             }
         };
 
@@ -92,16 +99,16 @@ public class WhitelistCmd extends Command {
                 if (isPlayer && !Player.hasPermission(player, "networkutilities.command.whitelist.check")) break;
 
                 Configuration check = messages.getSection("check");
-                Consumer<String> msg = token -> message.accept(check, token);
+                BiConsumer<String, Map<String, String>> msg = (token, placeholders) -> message.accept(check, token, placeholders);
 
                 // check command length - check needs 1 argument
                 if (args.length < 2) {
                     // argument is missing
-                    msg.accept("missing");
+                    msg.accept("missing", null);
                     break;
                 } else if (args.length > 2) {
                     // too many arguments
-                    msg.accept("toomany");
+                    msg.accept("toomany", null);
                     break;
                 }
 
@@ -115,7 +122,7 @@ public class WhitelistCmd extends Command {
                     try {
                         Minecraft.getUsername(uuid);
                     } catch (ApiException e) {
-                        msg.accept("invalidUuid");
+                        msg.accept("invalidUuid", null);
                         break;
                     }
                 } else {
@@ -123,7 +130,7 @@ public class WhitelistCmd extends Command {
                     try {
                         uuid = Minecraft.getUuid(input);
                     } catch (ApiException e) {
-                        msg.accept("invalidName");
+                        msg.accept("invalidName", null);
                         break;
                     }
                 }
@@ -135,18 +142,9 @@ public class WhitelistCmd extends Command {
                 // check if whitelisted
                 if (Whitelist.isWhitelisted(uuid)) {
                     // requested player is whitelisted
-                    msg.accept("whitelisted");
-                    if (isPlayer) {
-                        Communication.playerCfgMsg(player, check, "whitelisted", placeholders);
-                    } else {
-                        Communication.senderCfgMsg(sender, check, "whitelisted", placeholders);
-                    }
+                    msg.accept("whitelisted", placeholders);
                 } else {
-                    if (isPlayer) {
-                        Communication.playerCfgMsg(player, check, "notWhitelisted", placeholders);
-                    } else {
-                        Communication.senderCfgMsg(sender, check, "notWhitelisted", placeholders);
-                    }
+                    msg.accept("notWhitelisted", placeholders);
                 }
 
                 break;
@@ -157,12 +155,12 @@ public class WhitelistCmd extends Command {
                 if (isPlayer && !Player.hasPermission(player, "networkutilities.command.whitelist.list")) break;
 
                 Configuration list = messages.getSection("list");
-                Consumer<String> msg = token -> message.accept(list, token);
+                BiConsumer<String, Map<String, String>> msg = (token, placeholders) -> message.accept(list, token, placeholders);
 
                 // check command length - list needs no argument
                 if (args.length > 2) {
                     // to many arguments
-                    msg.accept("toomany");
+                    msg.accept("toomany", null);
                     break;
                 }
 
@@ -180,22 +178,19 @@ public class WhitelistCmd extends Command {
                 break;
             }
             case "add": {
-                if (isPlayer) {
-                    // player entered the command
-                    if (!Player.hasPermission(player, "networkutilities.command.whitelist.add")) break;
-                }
+                if (isPlayer && !Player.hasPermission(player, "networkutilities.command.whitelist.add")) break;
 
                 Configuration add = messages.getSection("add");
-                Consumer<String> msg = token -> message.accept(add, token);
+                BiConsumer<String, Map<String, String>> msg = (token, placeholders) -> message.accept(add, token, placeholders);
 
                 // check command length - add needs 1 argument
                 if (args.length < 2) {
                     // argument is missing
-                    msg.accept("missing");
+                    msg.accept("missing", null);
                     break;
                 } else if (args.length > 2) {
                     // too many arguments
-                    msg.accept("missing");
+                    msg.accept("missing", null);
                     break;
                 }
 
@@ -209,7 +204,7 @@ public class WhitelistCmd extends Command {
                     try {
                         Minecraft.getUsername(uuid);
                     } catch (ApiException e) {
-                        msg.accept("invalidUuid");
+                        msg.accept("invalidUuid", null);
                         break;
                     }
                 } else {
@@ -217,7 +212,7 @@ public class WhitelistCmd extends Command {
                     try {
                         uuid = Minecraft.getUuid(input);
                     } catch (ApiException e) {
-                        msg.accept("invalidName");
+                        msg.accept("invalidName", null);
                         break;
                     }
                 }
@@ -229,11 +224,7 @@ public class WhitelistCmd extends Command {
                 // check if player is whitelisted already
                 if (Whitelist.isWhitelisted(uuid)) {
                     // player is already whitelisted
-                    if (isPlayer) {
-                        Communication.playerCfgMsg(player, add, "already", placeholders);
-                    } else {
-                        Communication.senderCfgMsg(sender, add, "already", placeholders);
-                    }
+                    msg.accept("already", placeholders);
                     break;
                 }
 
@@ -241,18 +232,10 @@ public class WhitelistCmd extends Command {
                 try {
                     if (Whitelist.add(uuid)) {
                         // added successfully
-                        if (isPlayer) {
-                            Communication.playerCfgMsg(player, add, "success", placeholders);
-                        } else {
-                            Communication.senderCfgMsg(sender, add, "success", placeholders);
-                        }
+                        msg.accept("success", placeholders);
                     } else {
                         // failed to add
-                        if (isPlayer) {
-                            Communication.playerCfgMsg(player, add, "failed", placeholders);
-                        } else {
-                            Communication.senderCfgMsg(sender, add, "failed", placeholders);
-                        }
+                        msg.accept("failed", placeholders);
                     }
                 } catch (PluginConfigException e) {
                     e.printStackTrace();
@@ -265,16 +248,16 @@ public class WhitelistCmd extends Command {
                 if (isPlayer && !Player.hasPermission(player, "networkutilities.command.whitelist.remove")) break;
 
                 Configuration remove = messages.getSection("remove");
-                Consumer<String> msg = token -> message.accept(remove, token);
+                BiConsumer<String, Map<String, String>> msg = (token, placeholders) -> message.accept(remove, token, placeholders);
 
                 // check command length - remove needs 1 argument
                 if (args.length < 2) {
                     // argument is missing
-                    msg.accept("missing");
+                    msg.accept("missing", null);
                     break;
                 } else if (args.length > 2) {
                     // too many arguments
-                    msg.accept("toomany");
+                    msg.accept("toomany", null);
                     break;
                 }
 
@@ -288,7 +271,7 @@ public class WhitelistCmd extends Command {
                     try {
                         Minecraft.getUsername(uuid);
                     } catch (ApiException e) {
-                        msg.accept("invalidUuid");
+                        msg.accept("invalidUuid", null);
                         break;
                     }
                 } else {
@@ -296,7 +279,7 @@ public class WhitelistCmd extends Command {
                     try {
                         uuid = Minecraft.getUuid(input);
                     } catch (ApiException e) {
-                        msg.accept("invalidName");
+                        msg.accept("invalidName", null);
                         break;
                     }
                 }
@@ -308,11 +291,7 @@ public class WhitelistCmd extends Command {
                 // check if player is unwhitelisted already
                 if (!Whitelist.isWhitelisted(uuid)) {
                     // player is already unwhitelisted
-                    if (isPlayer) {
-                        Communication.playerCfgMsg(player, remove, "already", placeholders);
-                    } else {
-                        Communication.senderCfgMsg(sender, remove, "already", placeholders);
-                    }
+                    msg.accept("already", placeholders);
                     break;
                 }
 
@@ -320,23 +299,14 @@ public class WhitelistCmd extends Command {
                 try {
                     if (Whitelist.remove(uuid)) {
                         // added successfully
-                        if (isPlayer) {
-                            Communication.playerCfgMsg(player, remove, "success", placeholders);
-                        } else {
-                            Communication.senderCfgMsg(sender, remove, "success", placeholders);
-                        }
+                        msg.accept("success", placeholders);
                     } else {
                         // failed to add
-                        if (isPlayer) {
-                            Communication.playerCfgMsg(player, remove, "failed", placeholders);
-                        } else {
-                            Communication.senderCfgMsg(sender, remove, "failed", placeholders);
-                        }
+                        msg.accept("failed", placeholders);
                     }
                 } catch (PluginConfigException e) {
                     e.printStackTrace();
                 }
-
                 break;
             }
         }
